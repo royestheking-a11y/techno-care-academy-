@@ -4,28 +4,38 @@ import { motion, AnimatePresence } from 'motion/react';
 interface SplashScreenProps {
     onComplete: () => void;
     minDuration?: number;
+    isDataLoaded?: boolean;
 }
 
-export function SplashScreen({ onComplete, minDuration = 2500 }: SplashScreenProps) {
+export function SplashScreen({ onComplete, minDuration = 2500, isDataLoaded = true }: SplashScreenProps) {
     const [isExiting, setIsExiting] = useState(false);
+    const [minDurationPassed, setMinDurationPassed] = useState(false);
 
     useEffect(() => {
-        // Check if splash was already shown this session
-        const splashShown = sessionStorage.getItem('splashShown');
-        if (splashShown === 'true') {
-            onComplete();
-            return;
-        }
-
+        // Timer for minimum duration
         const timer = setTimeout(() => {
+            setMinDurationPassed(true);
+        }, minDuration);
+
+        return () => clearTimeout(timer);
+    }, [minDuration]);
+
+    useEffect(() => {
+        // Only exit if BOTH min duration passed AND data is loaded
+        if (minDurationPassed && isDataLoaded && !isExiting) {
+            // Check if splash was already shown this session
+            const splashShown = sessionStorage.getItem('splashShown');
+            if (splashShown === 'true') {
+                onComplete();
+                return;
+            }
+
             setIsExiting(true);
             sessionStorage.setItem('splashShown', 'true');
             // Wait for exit animation to complete
             setTimeout(onComplete, 600);
-        }, minDuration);
-
-        return () => clearTimeout(timer);
-    }, [minDuration, onComplete]);
+        }
+    }, [minDurationPassed, isDataLoaded, isExiting, onComplete]);
 
     // Don't render if already shown
     const splashShown = sessionStorage.getItem('splashShown');

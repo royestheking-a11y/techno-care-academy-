@@ -23,7 +23,7 @@ async function connectDB() {
         }
 
         cached.promise = mongoose.connect(process.env.MONGODB_URI, opts).then((mongoose) => {
-            console.log('✅ MongoDB Connected via Cached Connection');
+            console.log(`✅ MongoDB Connected via Cached Connection. DB Name: "${mongoose.connection.name}"`);
             return mongoose;
         });
     }

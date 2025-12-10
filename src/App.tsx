@@ -53,6 +53,7 @@ type PageRoute =
 export default function App() {
   const [currentPage, setCurrentPage] = useState<PageRoute>("home");
   const [showSplash, setShowSplash] = useState(true);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   // Initialize app and preload data during splash
   useEffect(() => {
@@ -64,14 +65,25 @@ export default function App() {
       // Preload critical data during splash screen
       try {
         const localStorage = await import("./utils/localStorage");
+
+        // Fetch ALL critical data
         await Promise.all([
           localStorage.getSlides(),
           localStorage.getCourses(),
           localStorage.getTeachers(),
           localStorage.getBooks(),
+          localStorage.getLiveClasses(),
+          localStorage.getSchedules(),
+          localStorage.getInstitutes(),
+          localStorage.getNotes(),
         ]);
+
+        // Mark data as loaded
+        setIsDataLoaded(true);
       } catch (error) {
         console.warn("Data preloading error:", error);
+        // Even on error, we should eventually let the user in
+        setIsDataLoaded(true);
       }
     };
 
@@ -351,7 +363,11 @@ export default function App() {
     <AuthProvider>
       {/* Splash Screen - blocks content until complete */}
       {showSplash && (
-        <SplashScreen onComplete={() => setShowSplash(false)} minDuration={2500} />
+        <SplashScreen
+          onComplete={() => setShowSplash(false)}
+          minDuration={2500}
+          isDataLoaded={isDataLoaded}
+        />
       )}
 
       {/* Main content - only visible after splash completes */}
