@@ -52,7 +52,7 @@ export function SplashScreen({ onComplete, minDuration = 2500, isDataLoaded = tr
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.5, ease: 'easeOut' }}
-                    className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-gradient-to-br from-[#1A3A32] via-[#285046] to-[#2F6057]"
+                    className="fixed inset-0 z-[9999] h-screen w-screen flex flex-col items-center justify-center bg-[#1A3A32] bg-gradient-to-br from-[#1A3A32] via-[#285046] to-[#2F6057]"
                 >
                     {/* Animated Background Elements */}
                     <div className="absolute inset-0 overflow-hidden pointer-events-none">
