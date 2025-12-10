@@ -329,7 +329,7 @@ export function Navbar({ onNavigateToDashboard, onOpenLogin, onOpenSignup }: Nav
   return (
     <>
       <nav className="sticky top-0 z-50 bg-[#285046] shadow-lg">
-        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
+        <div className="container relative mx-auto px-3 sm:px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between gap-2 sm:gap-3 md:gap-4">
             {/* Logo */}
             <div className="flex-shrink-0 cursor-pointer">
@@ -497,171 +497,271 @@ export function Navbar({ onNavigateToDashboard, onOpenLogin, onOpenSignup }: Nav
               </div>
             </div>
           </div>
-        </div>
-      </nav>
-
-      {/* Mobile Menu Drawer */}
-      {showMobileMenu && (
-        <>
-          {/* Backdrop */}
-          <div
-            className="md:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity"
-            onClick={() => setShowMobileMenu(false)}
-          />
-
-          {/* Drawer Panel */}
-          <div
-            ref={mobileMenuRef}
-            className="md:hidden fixed inset-y-0 right-0 z-50 w-[85vw] max-w-[320px] bg-[#285046] shadow-2xl overflow-y-auto transition-transform duration-300 ease-in-out border-l border-white/10"
-          >
-            <div className="flex flex-col h-full">
-              {/* Drawer Header */}
-              <div className="flex items-center justify-between p-4 border-b border-white/10">
-                <span className="text-white font-semibold text-lg">Menu</span>
-                <button
-                  onClick={() => setShowMobileMenu(false)}
-                  className="p-2 bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Drawer Content */}
-              <div className="p-4 space-y-6 flex-1">
+          {/* Mobile Menu Dropdown - Aligned with Container */}
+          {showMobileMenu && (
+            <div
+              ref={mobileMenuRef}
+              className="md:hidden absolute top-full left-0 w-full bg-gradient-to-br from-[#285046] via-[#2F6057] to-[#285046] z-40 shadow-xl rounded-b-xl border-t border-white/10 overflow-hidden"
+            >
+              <div className="px-4 py-6 space-y-6">
                 {/* Search Bar in Mobile Menu */}
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Search..."
+                    placeholder="Search everything..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    className="w-full px-4 py-3 pr-10 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/30 text-sm"
+                    className="w-full px-4 py-4 pr-12 rounded-xl bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white placeholder:text-white/70 focus:outline-none focus:ring-2 focus:ring-white focus:border-white focus:bg-white/20 transition-all"
                   />
                   {searchQuery && (
                     <button
                       onClick={clearSearch}
-                      className="absolute right-10 top-1/2 -translate-y-1/2 text-white/80"
+                      className="absolute right-10 top-1/2 -translate-y-1/2 text-white/80 hover:text-white transition-colors"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-5 h-5" />
                     </button>
                   )}
-                  <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-white/80 w-4 h-4 pointer-events-none" />
+                  <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-white w-5 h-5 pointer-events-none" />
 
                   {/* Search Results Dropdown for Mobile */}
                   {showSearchResults && searchQuery && (
-                    <div className="absolute top-full mt-2 w-full bg-white rounded-xl shadow-xl overflow-hidden z-50 max-h-60 overflow-y-auto">
+                    <div className="absolute top-full mt-2 w-full bg-white rounded-xl shadow-2xl overflow-hidden z-50 max-h-80 overflow-y-auto">
                       {searchResults.length > 0 ? (
                         <div className="py-2">
                           {searchResults.map((item) => (
                             <button
                               key={item.id}
                               onClick={() => handleSearchItemClick(item)}
-                              className="w-full px-4 py-3 hover:bg-gray-50 transition-colors text-left flex items-center gap-3 border-b last:border-0 border-gray-100"
+                              className="w-full px-4 py-3 hover:bg-[#F7FAFC] transition-colors text-left flex items-center gap-3 group border-b last:border-0"
                             >
+                              <div className="flex-shrink-0">
+                                {renderItemIcon(item)}
+                              </div>
+
                               <div className="flex-1 min-w-0">
-                                <p className="text-gray-900 font-medium text-sm truncate">{item.title}</p>
-                                <p className="text-xs text-gray-500 truncate">{item.subtitle || item.type}</p>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-[#1A202C] font-semibold group-hover:text-[#285046] transition-colors text-sm truncate">
+                                    {item.title}
+                                  </p>
+                                  <span className="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full border">
+                                    {item.type}
+                                  </span>
+                                  {isLocked(item) && (
+                                    <Lock className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+                                  )}
+                                </div>
+                                <p className="text-xs text-[#555555] truncate mt-0.5">
+                                  {item.subtitle || item.type}
+                                </p>
+                                {isLocked(item) && (
+                                  <p className="text-[10px] text-amber-600 mt-1">
+                                    🔒 {!isAuthenticated ? "Login required" : "Enrollment required"}
+                                  </p>
+                                )}
                               </div>
                             </button>
                           ))}
                         </div>
                       ) : (
-                        <div className="p-4 text-center text-gray-500 text-sm">No results</div>
+                        <div className="px-4 py-8 text-center text-[#555555]">
+                          <Search className="w-8 h-8 mx-auto mb-3 text-gray-300" />
+                          <p className="text-sm">No results found</p>
+                        </div>
                       )}
                     </div>
                   )}
                 </div>
 
-                {/* Grid Links */}
+                {/* Quick Links */}
                 <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { id: 'courses', icon: BookOpen, label: 'কোর্স' },
-                    { id: 'teachers', icon: User, label: 'শিক্ষক' },
-                    { id: 'schedules', icon: Calendar, label: 'সময়সূচী' },
-                    { id: 'live-classes', icon: Video, label: 'লাইভ' },
-                    { id: 'books', icon: Book, label: 'বই' },
-                    { id: 'notes', icon: BookOpen, label: 'নোটস' },
-                    { id: 'institutes', icon: GraduationCap, label: 'ইনস্টিটিউট' },
-                    { id: '', icon: Home, label: 'হোম' },
-                  ].map((link) => (
-                    <button
-                      key={link.id}
-                      onClick={() => {
+                  <button
+                    onClick={() => {
+                      setShowMobileMenu(false);
+                      window.location.hash = "courses";
+                    }}
+                    className="bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white rounded-xl p-4 hover:bg-white/20 transition-all"
+                  >
+                    <BookOpen className="w-6 h-6 mx-auto mb-2" />
+                    <span className="text-sm">কোর্স</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowMobileMenu(false);
+                      window.location.hash = "teachers";
+                    }}
+                    className="bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white rounded-xl p-4 hover:bg-white/20 transition-all"
+                  >
+                    <User className="w-6 h-6 mx-auto mb-2" />
+                    <span className="text-sm">শিক্ষক</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (!isAuthenticated) {
+                        toast.error("লগইন প্রয়োজন", {
+                          description: "রুটিন দেখতে অনুগ্রহ করে লগইন করুন"
+                        });
                         setShowMobileMenu(false);
-                        window.location.hash = link.id;
-                      }}
-                      className="flex flex-col items-center justify-center p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all text-white gap-2"
-                    >
-                      <link.icon className="w-5 h-5 opacity-80" />
-                      <span className="text-xs font-medium">{link.label}</span>
-                    </button>
-                  ))}
+                        onOpenLogin && onOpenLogin();
+                        return;
+                      }
+                      if (enrolledCourses.length === 0) {
+                        toast.error("এনরোলমেন্ট প্রয়োজন", {
+                          description: "রুটিন দেখতে যেকোনো একটি কোর্সে এনরোল থাকতে হবে"
+                        });
+                        return;
+                      }
+                      setShowMobileMenu(false);
+                      window.location.hash = "schedules";
+                    }}
+                    className="bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white rounded-xl p-4 hover:bg-white/20 transition-all"
+                  >
+                    <Calendar className="w-6 h-6 mx-auto mb-2" />
+                    <span className="text-sm">সময়সূচী</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (!isAuthenticated) {
+                        toast.error("লগইন প্রয়োজন", {
+                          description: "লাইভ ক্লাস দেখতে অনুগ্রহ করে লগইন করুন"
+                        });
+                        setShowMobileMenu(false);
+                        onOpenLogin && onOpenLogin();
+                        return;
+                      }
+                      if (enrolledCourses.length === 0) {
+                        toast.error("এনরোলমেন্ট প্রয়োজন", {
+                          description: "লাইভ কলাস দেখতে যেকোনো একটি কোর্সে এনরোল থাকতে হবে"
+                        });
+                        return;
+                      }
+                      setShowMobileMenu(false);
+                      window.location.hash = "live-classes";
+                    }}
+                    className="bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white rounded-xl p-4 hover:bg-white/20 transition-all"
+                  >
+                    <Video className="w-6 h-6 mx-auto mb-2" />
+                    <span className="text-sm">লাইভ ক্লাস</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowMobileMenu(false);
+                      window.location.hash = "books";
+                    }}
+                    className="bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white rounded-xl p-4 hover:bg-white/20 transition-all"
+                  >
+                    <Book className="w-6 h-6 mx-auto mb-2" />
+                    <span className="text-sm">বই</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (!isAuthenticated) {
+                        toast.error("লগইন প্রয়োজন", {
+                          description: "নোটস দেখতে অনুগ্রহ করে লগইন করুন"
+                        });
+                        setShowMobileMenu(false);
+                        onOpenLogin && onOpenLogin();
+                        return;
+                      }
+                      if (enrolledCourses.length === 0) {
+                        toast.error("এনরোলমেন্ট প্রয়োজন", {
+                          description: "নোটস দেখতে যেকোনো একটি কোর্সে এনরোল থাকতে হবে"
+                        });
+                        return;
+                      }
+                      setShowMobileMenu(false);
+                      window.location.hash = "notes";
+                    }}
+                    className="bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white rounded-xl p-4 hover:bg-white/20 transition-all"
+                  >
+                    <BookOpen className="w-6 h-6 mx-auto mb-2" />
+                    <span className="text-sm">নোটস</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowMobileMenu(false);
+                      window.location.hash = "institutes";
+                    }}
+                    className="bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white rounded-xl p-4 hover:bg-white/20 transition-all"
+                  >
+                    <GraduationCap className="w-6 h-6 mx-auto mb-2" />
+                    <span className="text-sm">ইনস্টিটিউট</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowMobileMenu(false);
+                      window.location.hash = "";
+                    }}
+                    className="bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white rounded-xl p-4 hover:bg-white/20 transition-all"
+                  >
+                    <Home className="w-6 h-6 mx-auto mb-2" />
+                    <span className="text-sm">হোমপেজ</span>
+                  </button>
                 </div>
 
-                {/* Auth Buttons */}
-                <div className="pt-4 border-t border-white/10 space-y-3">
-                  {isAuthenticated && user ? (
-                    <>
-                      <div className="flex items-center gap-3 p-3 bg-white/10 rounded-xl">
-                        <Avatar className="w-10 h-10 ring-2 ring-white/30">
-                          <AvatarImage src={user.profilePicture || ""} />
-                          <AvatarFallback className="bg-[#FFB703] text-white">
-                            {user.name?.charAt(0) || "U"}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="overflow-hidden">
-                          <p className="text-sm font-medium text-white truncate">{user.name}</p>
-                          <p className="text-xs text-white/70 truncate">{user.email}</p>
-                        </div>
+                {/* User Section */}
+                {isAuthenticated && user ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-4 bg-white/10 backdrop-blur-sm border-2 border-white/30 rounded-xl">
+                      <Avatar className="w-12 h-12 ring-2 ring-white/50">
+                        <AvatarImage src={user.profilePicture || ""} />
+                        <AvatarFallback className="bg-[#FFB703] text-white">
+                          {user.name?.charAt(0) || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-sm text-white">{user.name}</p>
+                        <p className="text-xs text-white/70">{user.email}</p>
                       </div>
-                      <button
-                        onClick={() => {
-                          setShowMobileMenu(false);
-                          onNavigateToDashboard?.();
-                        }}
-                        className="w-full py-3 bg-white text-[#285046] rounded-xl font-medium shadow-sm active:scale-95 transition-transform"
-                      >
-                        ড্যাশবোর্ড
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowMobileMenu(false);
-                          handleLogout();
-                        }}
-                        className="w-full py-3 bg-transparent border border-white/30 text-white rounded-xl font-medium active:scale-95 transition-transform hover:bg-white/5"
-                      >
-                        লগ আউট
-                      </button>
-                    </>
-                  ) : (
-                    <div className="space-y-3">
-                      <Button
-                        onClick={() => {
-                          setShowMobileMenu(false);
-                          if (onOpenLogin) onOpenLogin();
-                        }}
-                        className="w-full bg-white text-[#285046] hover:bg-white/90 py-6 rounded-xl font-semibold shadow-md"
-                      >
-                        লগইন
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          setShowMobileMenu(false);
-                          if (onOpenSignup) onOpenSignup();
-                        }}
-                        className="w-full bg-[#FFB703] text-black hover:bg-[#FFB703]/90 py-6 rounded-xl font-semibold shadow-md"
-                      >
-                        সাইন আপ
-                      </Button>
                     </div>
-                  )}
-                </div>
+                    <button
+                      onClick={() => {
+                        setShowMobileMenu(false);
+                        onNavigateToDashboard?.();
+                      }}
+                      className="w-full px-4 py-4 bg-white text-[#285046] rounded-xl flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transition-all"
+                    >
+                      <UserCircle className="w-5 h-5" />
+                      ড্যাশবোর্ড
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowMobileMenu(false);
+                        handleLogout();
+                      }}
+                      className="w-full px-4 py-4 bg-red-500/20 border-2 border-red-300 text-white rounded-xl flex items-center justify-center gap-2 hover:bg-red-500/30 transition-all"
+                    >
+                      <LogOut className="w-5 h-5" />
+                      লগ আউট
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <Button
+                      onClick={() => {
+                        setShowMobileMenu(false);
+                        if (onOpenLogin) onOpenLogin();
+                      }}
+                      className="w-full bg-white text-[#285046] hover:bg-white/90 rounded-xl py-6 text-base shadow-lg hover:shadow-xl transition-all"
+                    >
+                      লগইন
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setShowMobileMenu(false);
+                        if (onOpenSignup) onOpenSignup();
+                      }}
+                      className="w-full bg-gradient-to-r from-[#FFB703] to-[#FB8500] hover:from-[#FB8500] hover:to-[#FFB703] text-white rounded-xl py-6 text-base shadow-lg hover:shadow-xl transition-all"
+                    >
+                      সাইন আপ
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
-        </>
-      )}
+          )}
+        </div>
+      </nav>
 
       {/* Call Dialog */}
       <Dialog open={showCallDialog} onOpenChange={setShowCallDialog}>
