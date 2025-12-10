@@ -1,0 +1,12 @@
+{
+    "rewrites": [
+        {
+            "source": "/api/(.*)",
+            "destination": "/api"
+        }
+    ],
+    "build": {
+        "command": "npm install && npm run build --prefix server",
+        "output": "build"
+    }
+}
