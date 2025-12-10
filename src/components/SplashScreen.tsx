@@ -12,10 +12,17 @@ export function SplashScreen({ onComplete, minDuration = 2500, isDataLoaded = tr
     const [minDurationPassed, setMinDurationPassed] = useState(false);
 
     useEffect(() => {
+        // Check if splash was already shown this session
+        const splashShown = sessionStorage.getItem('splashShown');
+
+        // If already shown, we don't enforce the minimum duration (set to 0),
+        // BUT we still wait for data to be loaded.
+        const effectiveDuration = splashShown === 'true' ? 0 : minDuration;
+
         // Timer for minimum duration
         const timer = setTimeout(() => {
             setMinDurationPassed(true);
-        }, minDuration);
+        }, effectiveDuration);
 
         return () => clearTimeout(timer);
     }, [minDuration]);
@@ -23,12 +30,10 @@ export function SplashScreen({ onComplete, minDuration = 2500, isDataLoaded = tr
     useEffect(() => {
         // Only exit if BOTH min duration passed AND data is loaded
         if (minDurationPassed && isDataLoaded && !isExiting) {
-            // Check if splash was already shown this session
-            const splashShown = sessionStorage.getItem('splashShown');
-            if (splashShown === 'true') {
-                onComplete();
-                return;
-            }
+
+            // If it's a reload (duration 0) and data is ready instantly, 
+            // we might want to skip animation or keep it fast. 
+            // For now, consistent exit animation is safer than a "cut".
 
             setIsExiting(true);
             sessionStorage.setItem('splashShown', 'true');
@@ -37,9 +42,8 @@ export function SplashScreen({ onComplete, minDuration = 2500, isDataLoaded = tr
         }
     }, [minDurationPassed, isDataLoaded, isExiting, onComplete]);
 
-    // Don't render if already shown
-    const splashShown = sessionStorage.getItem('splashShown');
-    if (splashShown === 'true') return null;
+    // Removed the early return "if (splashShown) return null" 
+    // because that was causing the white page while waiting for data.
 
     return (
         <AnimatePresence>
