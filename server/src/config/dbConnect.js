@@ -17,8 +17,13 @@ async function connectDB() {
             bufferCommands: false,
         };
 
+        if (!process.env.MONGODB_URI) {
+            console.error('❌ MONGODB_URI is undefined! Check Vercel Environment Variables.');
+            throw new Error('MONGODB_URI is undefined');
+        }
+
         cached.promise = mongoose.connect(process.env.MONGODB_URI, opts).then((mongoose) => {
-            console.log('MongoDB Connected via Cached Connection');
+            console.log('✅ MongoDB Connected via Cached Connection');
             return mongoose;
         });
     }
