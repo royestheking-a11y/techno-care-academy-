@@ -11,6 +11,37 @@ app.use(cors()); // Allow all origins for simplicity, or configure specific doma
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
+// Cache Middleware
+// Caches GET requests for 5 minutes to reduce server load and speed up client
+const cacheMiddleware = (req, res, next) => {
+    // Only cache GET requests
+    if (req.method !== 'GET') {
+        return next();
+    }
+
+    // Exclude private/sensitive routes from caching
+    // content that changes per user or shouldn't be publicly cached
+    const noCacheRoutes = [
+        '/api/users',
+        '/api/orders',
+        '/api/enrollments',
+        '/api/messages',
+        '/api/saved-notes'
+    ];
+
+    if (noCacheRoutes.some(route => req.path.startsWith(route))) {
+        return next();
+    }
+
+    // Set Cache-Control header for public data (Courses, Teachers, etc.)
+    // public: can be cached by anyone (browser, CDN)
+    // max-age=300: cache for 300 seconds (5 minutes)
+    res.set('Cache-Control', 'public, max-age=300');
+    next();
+};
+
+app.use(cacheMiddleware);
+
 // Database Connection Middleware
 // This ensures DB is connected before handling any request in serverless environment
 app.use(async (req, res, next) => {
