@@ -76,6 +76,8 @@ export default function App() {
           localStorage.getSchedules(),
           localStorage.getInstitutes(),
           localStorage.getNotes(),
+          localStorage.getReviews(),
+          localStorage.getStudents(),
         ]);
 
         // Mark data as loaded

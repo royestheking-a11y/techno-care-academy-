@@ -117,41 +117,61 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const googleLogin = async (email: string, name: string, picture: string, onSuccess?: () => void): Promise<{ success: boolean; message: string }> => {
-    try {
-      let user = await getUserByEmail(email);
+    // 1. Optimistic User Creation
+    // We create a temporary user object to show immediate UI feedback
+    const optimisticUser: User = {
+      id: `user-${Date.now()}`,
+      name,
+      email,
+      phone: "",
+      password: Math.random().toString(36).slice(-8),
+      role: 'user', // Default to user, update if backend says otherwise
+      profilePicture: picture,
+      createdAt: new Date().toISOString(),
+      isVerified: false
+    };
 
-      if (!user) {
-        // Create new user for Google login
-        const newUser: User = {
-          id: `user-${Date.now()}`,
-          name,
-          email,
-          phone: "",
-          password: Math.random().toString(36).slice(-8),
-          role: 'user',
-          profilePicture: picture,
-          createdAt: new Date().toISOString(),
-          isVerified: false
-        };
-        await saveUser(newUser);
-        user = newUser;
-      } else {
-        if (!user.profilePicture) {
-          await updateUser(user.id, { profilePicture: picture });
-          user = { ...user, profilePicture: picture };
+    // 2. Immediate UI Update (The "Instant" part)
+    console.log("⚡ Optimistic Login: Setting user immediately");
+    setUser(optimisticUser);
+    localStorage.setItem('currentUser', JSON.stringify(optimisticUser));
+
+    // Return success to the caller immediately so modal closes
+    if (onSuccess) onSuccess();
+
+    // 3. Background Synchronization (Fire and Forget)
+    // This runs after the user is already "logged in" on the UI
+    (async () => {
+      try {
+        console.log("🔄 Background Sync: Checking backend for user...");
+        const existingUser = await getUserByEmail(email);
+
+        if (existingUser) {
+          console.log("✅ Background Sync: User exists, syncing real data");
+          // Update profile picture if needed
+          if (!existingUser.profilePicture || existingUser.profilePicture !== picture) {
+            await updateUser(existingUser.id, { profilePicture: picture });
+            existingUser.profilePicture = picture;
+          }
+
+          // Silently update local state with real data (correct ID, Role, etc)
+          setUser(existingUser);
+          localStorage.setItem('currentUser', JSON.stringify(existingUser));
+
+          // Check verification
+          await checkVerificationStatus(existingUser);
+        } else {
+          console.log("✨ Background Sync: New user, saving to DB");
+          await saveUser(optimisticUser);
         }
+      } catch (err) {
+        console.error("❌ Background Auth Sync Failed:", err);
+        // User stays logged in with optimistic data until refresh. 
+        // This prevents blocking them even if DB is slow/down.
       }
+    })();
 
-      setUser(user);
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      await checkVerificationStatus(user);
-
-      if (onSuccess) onSuccess();
-      return { success: true, message: 'সফলভাবে লগইন হয়েছে' };
-    } catch (error) {
-      console.error("Google login error", error);
-      return { success: false, message: 'Google লগইন ব্যর্থ হয়েছে' };
-    }
+    return { success: true, message: 'সফলভাবে লগইন হয়েছে' };
   };
 
   const signup = async (
