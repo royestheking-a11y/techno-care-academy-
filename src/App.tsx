@@ -372,79 +372,77 @@ export default function App() {
         />
       )}
 
-      {/* Main content - only visible after splash completes */}
-      {!showSplash && (
-        <div className="min-h-screen bg-white">
-          <Toaster position="top-right" />
+      {/* Main content - always rendered but covered by splash initially */}
+      <div className="min-h-screen bg-white">
+        <Toaster position="top-right" />
 
-          {/* Navigation */}
-          <Navbar
-            searchData={searchData}
-            onNavigateToDashboard={() => navigateTo("dashboard")}
-            onOpenLogin={() => navigateTo("login")}
-            onOpenSignup={() => navigateTo("signup")}
-          />
+        {/* Navigation */}
+        <Navbar
+          searchData={searchData}
+          onNavigateToDashboard={() => navigateTo("dashboard")}
+          onOpenLogin={() => navigateTo("login")}
+          onOpenSignup={() => navigateTo("signup")}
+        />
 
-          {/* Floating Chat Button */}
-          <FloatingChat />
+        {/* Floating Chat Button */}
+        <FloatingChat />
 
-          {/* Hero Section */}
-          <HeroCarousel />
+        {/* Hero Section */}
+        <HeroCarousel />
 
-          {/* Quick Tabs Menu */}
-          <QuickTabs onTabClick={handleTabClick} />
+        {/* Quick Tabs Menu */}
+        <QuickTabs onTabClick={handleTabClick} />
 
-          {/* Courses Section */}
-          <div id="courses">
-            <CourseSection />
-          </div>
-
-          {/* Notes Section - Moved here after Courses */}
-          <div id="notes">
-            <NotesSection />
-          </div>
-
-          {/* Class Schedule Section */}
-          <div id="schedule">
-            <ClassSchedule />
-          </div>
-
-          {/* Live Class Section */}
-          <div id="live">
-            <LiveClassSection />
-          </div>
-
-          {/* Teachers Section */}
-          <div id="teachers">
-            <TeacherSection />
-          </div>
-
-          {/* Books Section */}
-          <div id="books">
-            <BooksSection />
-          </div>
-
-          {/* Stats Section */}
-          <StatsSection />
-
-          {/* Services Section */}
-          <ServicesSection />
-
-          {/* Reviews Section - Public Testimonials */}
-          <TestimonialsSection />
-
-          {/* Polytechnic Institutes Section */}
-          <div id="institutes">
-            <PolytechnicSection />
-          </div>
-
-          {/* Contact Section */}
-          <ContactSection />
-
-          {/* Footer */}
-          <Footer />
+        {/* Courses Section */}
+        <div id="courses">
+          <CourseSection />
         </div>
-      )}
+
+        {/* Notes Section - Moved here after Courses */}
+        <div id="notes">
+          <NotesSection />
+        </div>
+
+        {/* Class Schedule Section */}
+        <div id="schedule">
+          <ClassSchedule />
+        </div>
+
+        {/* Live Class Section */}
+        <div id="live">
+          <LiveClassSection />
+        </div>
+
+        {/* Teachers Section */}
+        <div id="teachers">
+          <TeacherSection />
+        </div>
+
+        {/* Books Section */}
+        <div id="books">
+          <BooksSection />
+        </div>
+
+        {/* Stats Section */}
+        <StatsSection />
+
+        {/* Services Section */}
+        <ServicesSection />
+
+        {/* Reviews Section - Public Testimonials */}
+        <TestimonialsSection />
+
+        {/* Polytechnic Institutes Section */}
+        <div id="institutes">
+          <PolytechnicSection />
+        </div>
+
+        {/* Contact Section */}
+        <ContactSection />
+
+        {/* Footer */}
+        <Footer />
+      </div>
     </AuthProvider>
   );
 }
