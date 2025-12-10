@@ -322,14 +322,12 @@ export const saveReview = async (reviewData: Omit<Review, "id" | "createdAt" | "
     status: "pending"
   };
   const response = await api.post('/reviews', newReview);
-  clearCache(CACHE_KEYS.REVIEWS);
   return response.data;
 };
 
 export const updateReviewStatus = async (id: string, status: "approved" | "hidden"): Promise<boolean> => {
   try {
     await api.put(`/reviews/${id}`, { status });
-    clearCache(CACHE_KEYS.REVIEWS);
     return true;
   } catch (e) {
     return false;
@@ -339,7 +337,6 @@ export const updateReviewStatus = async (id: string, status: "approved" | "hidde
 export const deleteReview = async (id: string): Promise<boolean> => {
   try {
     await api.delete(`/reviews/${id}`);
-    clearCache(CACHE_KEYS.REVIEWS);
     return true;
   } catch (e) {
     return false;
@@ -617,7 +614,6 @@ export const deleteSchedule = async (id: number) => {
 };
 
 // Students (Success Stories)
-// Students (Success Stories)
 export const getStudents = async (): Promise<Student[]> => {
   try {
     return await cachedFetch(CACHE_KEYS.STUDENTS, async () => {
@@ -631,17 +627,14 @@ export const getStudents = async (): Promise<Student[]> => {
 };
 export const saveStudent = async (student: Student) => {
   const response = await api.post('/students', student);
-  clearCache(CACHE_KEYS.STUDENTS);
   return response.data;
 };
 export const updateStudent = async (id: number, updates: Partial<Student>) => {
   const response = await api.put(`/students/${id}`, updates);
-  clearCache(CACHE_KEYS.STUDENTS);
   return response.data;
 };
 export const deleteStudent = async (id: number) => {
   await api.delete(`/students/${id}`);
-  clearCache(CACHE_KEYS.STUDENTS);
 };
 
 // Messages

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { Navbar } from "./components/Navbar";
 import { FloatingChat } from "./components/FloatingChat";
 import { HeroCarousel } from "./components/HeroCarousel";
@@ -15,24 +15,27 @@ import { TestimonialsSection } from "./components/TestimonialsSection";
 import { PolytechnicSection } from "./components/PolytechnicSection";
 import { ContactSection } from "./components/ContactSection";
 import { Footer } from "./components/Footer";
-import { AdminPanel } from "./components/admin/AdminPanel";
-import { UserDashboard } from "./components/UserDashboard";
-import { LoginPage } from "./components/auth/LoginPage";
-import { SignupPage } from "./components/auth/SignupPage";
-import { ForgotPasswordPage } from "./components/auth/ForgotPasswordPage";
-import { TeachersPage } from "./components/pages/TeachersPage";
-import { BooksPage } from "./components/pages/BooksPage";
-import { NotesPage } from "./components/pages/NotesPage";
-import { InstitutesPage } from "./components/pages/InstitutesPage";
-import { CoursesPage } from "./components/pages/CoursesPage";
-import { SchedulesPage } from "./components/pages/SchedulesPage";
-import { LiveClassesPage } from "./components/pages/LiveClassesPage";
-import { FreeExamPage } from "./components/FreeExamPage";
 import { Toaster } from "./components/ui/sonner";
 import { AuthProvider } from "./contexts/AuthContext";
 import { initializeApp } from "./utils/localStorage";
 import { initializeMockData } from "./utils/mockData";
 import { SplashScreen } from "./components/SplashScreen";
+import { Loader2 } from "lucide-react";
+
+// Lazy Load Pages to reduce initial bundle size
+const AdminPanel = lazy(() => import("./components/admin/AdminPanel").then(module => ({ default: module.AdminPanel })));
+const UserDashboard = lazy(() => import("./components/UserDashboard").then(module => ({ default: module.UserDashboard })));
+const LoginPage = lazy(() => import("./components/auth/LoginPage").then(module => ({ default: module.LoginPage })));
+const SignupPage = lazy(() => import("./components/auth/SignupPage").then(module => ({ default: module.SignupPage })));
+const ForgotPasswordPage = lazy(() => import("./components/auth/ForgotPasswordPage").then(module => ({ default: module.ForgotPasswordPage })));
+const TeachersPage = lazy(() => import("./components/pages/TeachersPage").then(module => ({ default: module.TeachersPage })));
+const BooksPage = lazy(() => import("./components/pages/BooksPage").then(module => ({ default: module.BooksPage })));
+const NotesPage = lazy(() => import("./components/pages/NotesPage").then(module => ({ default: module.NotesPage })));
+const InstitutesPage = lazy(() => import("./components/pages/InstitutesPage").then(module => ({ default: module.InstitutesPage })));
+const CoursesPage = lazy(() => import("./components/pages/CoursesPage").then(module => ({ default: module.CoursesPage })));
+const SchedulesPage = lazy(() => import("./components/pages/SchedulesPage").then(module => ({ default: module.SchedulesPage })));
+const LiveClassesPage = lazy(() => import("./components/pages/LiveClassesPage").then(module => ({ default: module.LiveClassesPage })));
+const FreeExamPage = lazy(() => import("./components/FreeExamPage").then(module => ({ default: module.FreeExamPage })));
 
 type PageRoute =
   | "home"
@@ -67,21 +70,30 @@ export default function App() {
         const localStorage = await import("./utils/localStorage");
 
         // Fetch ALL critical data
+        // 1. CRITICAL DATA (Blocks Splash Screen)
+        // Only fetch what is immediately visible "Above the Fold"
         await Promise.all([
-          localStorage.getSlides(),
-          localStorage.getCourses(),
+          localStorage.getSlides(),   // Hero Carousel
+          localStorage.getCourses(),  // First section
+          localStorage.getNotes(),    // Second section
+        ]);
+
+        // Mark critical data as loaded - DISMISS SPLASH SCREEN NOW
+        setIsDataLoaded(true);
+
+        // 2. BACKGROUND DATA (Non-Blocking)
+        // Fetch the rest while user is viewing the Hero/Courses
+        // This prevents the "1 minute wait" for deep footer content
+        Promise.all([
           localStorage.getTeachers(),
           localStorage.getBooks(),
           localStorage.getLiveClasses(),
           localStorage.getSchedules(),
           localStorage.getInstitutes(),
-          localStorage.getNotes(),
           localStorage.getReviews(),
           localStorage.getStudents(),
-        ]);
+        ]).catch(err => console.warn("Background data load error", err));
 
-        // Mark data as loaded
-        setIsDataLoaded(true);
       } catch (error) {
         console.warn("Data preloading error:", error);
         // Even on error, we should eventually let the user in
@@ -238,16 +250,27 @@ export default function App() {
     ];
   }, []);
 
+  const PageLoader = () => (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="flex flex-col items-center gap-4">
+        <Loader2 className="w-10 h-10 animate-spin text-[#285046]" />
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    </div>
+  );
+
   // Render based on current page
   if (currentPage === "login") {
     return (
       <AuthProvider>
         <Toaster position="top-right" />
-        <LoginPage
-          onNavigateToSignup={() => navigateTo("signup")}
-          onNavigateToHome={() => navigateTo("home")}
-          onNavigateToForgotPassword={() => navigateTo("forgot-password")}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <LoginPage
+            onNavigateToSignup={() => navigateTo("signup")}
+            onNavigateToHome={() => navigateTo("home")}
+            onNavigateToForgotPassword={() => navigateTo("forgot-password")}
+          />
+        </Suspense>
       </AuthProvider>
     );
   }
@@ -256,7 +279,9 @@ export default function App() {
     return (
       <AuthProvider>
         <Toaster position="top-right" />
-        <SignupPage onNavigateToLogin={() => navigateTo("login")} onNavigateToHome={() => navigateTo("home")} />
+        <Suspense fallback={<PageLoader />}>
+          <SignupPage onNavigateToLogin={() => navigateTo("login")} onNavigateToHome={() => navigateTo("home")} />
+        </Suspense>
       </AuthProvider>
     );
   }
@@ -265,7 +290,9 @@ export default function App() {
     return (
       <AuthProvider>
         <Toaster position="top-right" />
-        <ForgotPasswordPage onNavigateToLogin={() => navigateTo("login")} />
+        <Suspense fallback={<PageLoader />}>
+          <ForgotPasswordPage onNavigateToLogin={() => navigateTo("login")} />
+        </Suspense>
       </AuthProvider>
     );
   }
@@ -274,7 +301,9 @@ export default function App() {
     return (
       <AuthProvider>
         <Toaster position="top-right" />
-        <AdminPanel />
+        <Suspense fallback={<PageLoader />}>
+          <AdminPanel />
+        </Suspense>
       </AuthProvider>
     );
   }
@@ -283,7 +312,9 @@ export default function App() {
     return (
       <AuthProvider>
         <Toaster position="top-right" />
-        <UserDashboard onBackToHome={() => navigateTo("home")} />
+        <Suspense fallback={<PageLoader />}>
+          <UserDashboard onBackToHome={() => navigateTo("home")} />
+        </Suspense>
       </AuthProvider>
     );
   }
@@ -292,7 +323,9 @@ export default function App() {
     return (
       <AuthProvider>
         <Toaster position="top-right" />
-        <TeachersPage onBackToHome={() => navigateTo("home")} />
+        <Suspense fallback={<PageLoader />}>
+          <TeachersPage onBackToHome={() => navigateTo("home")} />
+        </Suspense>
       </AuthProvider>
     );
   }
@@ -301,7 +334,9 @@ export default function App() {
     return (
       <AuthProvider>
         <Toaster position="top-right" />
-        <BooksPage onBackToHome={() => navigateTo("home")} />
+        <Suspense fallback={<PageLoader />}>
+          <BooksPage onBackToHome={() => navigateTo("home")} />
+        </Suspense>
       </AuthProvider>
     );
   }
@@ -310,7 +345,9 @@ export default function App() {
     return (
       <AuthProvider>
         <Toaster position="top-right" />
-        <NotesPage onBackToHome={() => navigateTo("home")} />
+        <Suspense fallback={<PageLoader />}>
+          <NotesPage onBackToHome={() => navigateTo("home")} />
+        </Suspense>
       </AuthProvider>
     );
   }
@@ -319,7 +356,9 @@ export default function App() {
     return (
       <AuthProvider>
         <Toaster position="top-right" />
-        <InstitutesPage onBackToHome={() => navigateTo("home")} />
+        <Suspense fallback={<PageLoader />}>
+          <InstitutesPage onBackToHome={() => navigateTo("home")} />
+        </Suspense>
       </AuthProvider>
     );
   }
@@ -328,7 +367,9 @@ export default function App() {
     return (
       <AuthProvider>
         <Toaster position="top-right" />
-        <CoursesPage onBackToHome={() => navigateTo("home")} />
+        <Suspense fallback={<PageLoader />}>
+          <CoursesPage onBackToHome={() => navigateTo("home")} />
+        </Suspense>
       </AuthProvider>
     );
   }
@@ -337,7 +378,9 @@ export default function App() {
     return (
       <AuthProvider>
         <Toaster position="top-right" />
-        <SchedulesPage onBackToHome={() => navigateTo("home")} />
+        <Suspense fallback={<PageLoader />}>
+          <SchedulesPage onBackToHome={() => navigateTo("home")} />
+        </Suspense>
       </AuthProvider>
     );
   }
@@ -346,7 +389,9 @@ export default function App() {
     return (
       <AuthProvider>
         <Toaster position="top-right" />
-        <LiveClassesPage onBackToHome={() => navigateTo("home")} />
+        <Suspense fallback={<PageLoader />}>
+          <LiveClassesPage onBackToHome={() => navigateTo("home")} />
+        </Suspense>
       </AuthProvider>
     );
   }
@@ -355,7 +400,9 @@ export default function App() {
     return (
       <AuthProvider>
         <Toaster position="top-right" />
-        <FreeExamPage onBackToHome={() => navigateTo("home")} />
+        <Suspense fallback={<PageLoader />}>
+          <FreeExamPage onBackToHome={() => navigateTo("home")} />
+        </Suspense>
       </AuthProvider>
     );
   }
@@ -372,77 +419,79 @@ export default function App() {
         />
       )}
 
-      {/* Main content - always rendered but covered by splash initially */}
-      <div className="min-h-screen bg-white">
-        <Toaster position="top-right" />
+      {/* Main content - only visible after splash completes */}
+      {!showSplash && (
+        <div className="min-h-screen bg-white">
+          <Toaster position="top-right" />
 
-        {/* Navigation */}
-        <Navbar
-          searchData={searchData}
-          onNavigateToDashboard={() => navigateTo("dashboard")}
-          onOpenLogin={() => navigateTo("login")}
-          onOpenSignup={() => navigateTo("signup")}
-        />
+          {/* Navigation */}
+          <Navbar
+            searchData={searchData}
+            onNavigateToDashboard={() => navigateTo("dashboard")}
+            onOpenLogin={() => navigateTo("login")}
+            onOpenSignup={() => navigateTo("signup")}
+          />
 
-        {/* Floating Chat Button */}
-        <FloatingChat />
+          {/* Floating Chat Button */}
+          <FloatingChat />
 
-        {/* Hero Section */}
-        <HeroCarousel />
+          {/* Hero Section */}
+          <HeroCarousel />
 
-        {/* Quick Tabs Menu */}
-        <QuickTabs onTabClick={handleTabClick} />
+          {/* Quick Tabs Menu */}
+          <QuickTabs onTabClick={handleTabClick} />
 
-        {/* Courses Section */}
-        <div id="courses">
-          <CourseSection />
+          {/* Courses Section */}
+          <div id="courses">
+            <CourseSection />
+          </div>
+
+          {/* Notes Section - Moved here after Courses */}
+          <div id="notes">
+            <NotesSection />
+          </div>
+
+          {/* Class Schedule Section */}
+          <div id="schedule">
+            <ClassSchedule />
+          </div>
+
+          {/* Live Class Section */}
+          <div id="live">
+            <LiveClassSection />
+          </div>
+
+          {/* Teachers Section */}
+          <div id="teachers">
+            <TeacherSection />
+          </div>
+
+          {/* Books Section */}
+          <div id="books">
+            <BooksSection />
+          </div>
+
+          {/* Stats Section */}
+          <StatsSection />
+
+          {/* Services Section */}
+          <ServicesSection />
+
+          {/* Reviews Section - Public Testimonials */}
+          <TestimonialsSection />
+
+          {/* Polytechnic Institutes Section */}
+          <div id="institutes">
+            <PolytechnicSection />
+          </div>
+
+          {/* Contact Section */}
+          <ContactSection />
+
+          {/* Footer */}
+          <Footer />
         </div>
-
-        {/* Notes Section - Moved here after Courses */}
-        <div id="notes">
-          <NotesSection />
-        </div>
-
-        {/* Class Schedule Section */}
-        <div id="schedule">
-          <ClassSchedule />
-        </div>
-
-        {/* Live Class Section */}
-        <div id="live">
-          <LiveClassSection />
-        </div>
-
-        {/* Teachers Section */}
-        <div id="teachers">
-          <TeacherSection />
-        </div>
-
-        {/* Books Section */}
-        <div id="books">
-          <BooksSection />
-        </div>
-
-        {/* Stats Section */}
-        <StatsSection />
-
-        {/* Services Section */}
-        <ServicesSection />
-
-        {/* Reviews Section - Public Testimonials */}
-        <TestimonialsSection />
-
-        {/* Polytechnic Institutes Section */}
-        <div id="institutes">
-          <PolytechnicSection />
-        </div>
-
-        {/* Contact Section */}
-        <ContactSection />
-
-        {/* Footer */}
-        <Footer />
-      </div>
+      )}
     </AuthProvider>
   );
 }
