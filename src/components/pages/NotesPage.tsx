@@ -6,6 +6,7 @@ import { Input } from "../ui/input";
 import { Badge } from "../ui/badge";
 import { useAuth } from "../../contexts/AuthContext";
 import { toast } from "sonner";
+import { getDownloadUrl } from "../../utils/cloudinary";
 
 interface NotesPageProps {
   onBackToHome: () => void;
@@ -59,6 +60,14 @@ export function NotesPage({ onBackToHome }: NotesPageProps) {
     }
 
     toast.success(`"${note.title}" ডাউনলোড হচ্ছে...`);
+
+    const downloadUrl = getDownloadUrl(note.fileUrl, note.title);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.setAttribute('download', note.title);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (

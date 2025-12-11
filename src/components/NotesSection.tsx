@@ -31,6 +31,7 @@ import {
   type Note,
   type SavedNote,
 } from "../utils/localStorage";
+import { getDownloadUrl } from "../utils/cloudinary";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
 
@@ -155,15 +156,17 @@ export function NotesSection() {
     if (action === "view") {
       setSelectedNote(note);
     } else {
-      toast.success("ডাউনলোড শুরু হয়েছে", {
+      toast.success("ডাউনলোড শুরু হয়েছে...", {
         description: note.title
       });
 
-      // Create temporary link to force download
+      // Create temporary link to force download using Cloudinary attachment flag
+      const downloadUrl = getDownloadUrl(note.fileUrl, note.title);
+
       const link = document.createElement('a');
-      link.href = note.fileUrl;
-      link.target = '_blank';
-      link.setAttribute('download', note.title); // Try to force download with filename
+      link.href = downloadUrl;
+      // link.target = '_blank'; // Removed to prevent opening new tab for downloads
+      link.setAttribute('download', note.title);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
