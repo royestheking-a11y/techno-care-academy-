@@ -51,7 +51,10 @@ export function GoogleLoginButton({ text = "Continue with Google", className = "
     return (
         <button
             type="button"
-            onClick={() => login()}
+            onClick={() => {
+                toast.loading("Connecting to Google...", { duration: 1000 });
+                login();
+            }}
             disabled={isLoading}
             className={`w-full flex items-center justify-center gap-3 bg-white border border-gray-200 hover:bg-gray-50 text-[#1f1f1f] font-medium py-2.5 px-4 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-70 disabled:cursor-not-allowed group ${className}`}
         >
