@@ -83,17 +83,22 @@ export function isBase64Image(url: string): boolean {
 export function isCloudinaryUrl(url: string): boolean {
     return typeof url === 'string' && url.includes('cloudinary.com');
 }
-// Generate a download URL for Cloudinary resources (forces download via backend proxy)
+// Generate a download URL for Cloudinary resources (forces download with fl_attachment)
 export function getDownloadUrl(url: string, filename?: string): string {
     if (!isCloudinaryUrl(url)) {
         return url;
     }
 
-    // Use backend proxy to avoid 401 errors and force download with correct filename
-    const encodedUrl = encodeURIComponent(url);
-    const encodedFilename = filename ? encodeURIComponent(filename) : 'download';
+    // Insert fl_attachment into the URL
+    // Format: /upload/fl_attachment:filename/
+    // or just /upload/fl_attachment/ if no filename
 
-    return `/api/download?url=${encodedUrl}&filename=${encodedFilename}`;
+    // Sanitize filename if provided
+    const attachmentFlag = filename
+        ? `fl_attachment:${filename.replace(/[^a-zA-Z0-9._-]/g, '_')}`
+        : 'fl_attachment';
+
+    return url.replace('/upload/', `/upload/${attachmentFlag}/`);
 }
 
 // Upload generic file to Cloudinary (auto detects type: image, video, raw)

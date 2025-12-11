@@ -1,69 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/dbConnect');
-const cloudinary = require('cloudinary').v2;
-
 require('dotenv').config();
 
-// Cloudinary Config
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'deal7ji7s',
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-});
-
-// Proxy download route to fix Cloudinary 401 errors using Signed URLs
-app.get('/api/download', (req, res) => {
-    const { url, filename } = req.query;
-
-    if (!url) {
-        return res.status(400).send('Missing url parameter');
-    }
-
-    try {
-        // Extract public_id and other details from the URL
-        // Example: https://res.cloudinary.com/cloud_name/image/upload/v1234/folder/file.pdf
-        const matches = url.match(/\/upload\/(?:v\d+\/)?(.+)$/);
-
-        if (!matches || !matches[1]) {
-            return res.redirect(url);
-        }
-
-        let publicIdWithExtension = matches[1];
-
-        // Split public_id and extension/format
-        const lastDotIndex = publicIdWithExtension.lastIndexOf('.');
-        let publicId = publicIdWithExtension;
-        let format = null;
-
-        if (lastDotIndex !== -1) {
-            publicId = publicIdWithExtension.substring(0, lastDotIndex);
-            format = publicIdWithExtension.substring(lastDotIndex + 1);
-        }
-
-        // Determine resource type (default to image, but try to detect based on url content)
-        // Cloudinary URLs usually have /image/upload or /raw/upload or /video/upload
-        let resourceType = 'image';
-        if (url.includes('/raw/')) resourceType = 'raw';
-        else if (url.includes('/video/')) resourceType = 'video';
-
-        // Generate Signed URL with "attachment" flag to force download
-        const signedUrl = cloudinary.url(publicId, {
-            resource_type: resourceType,
-            format: format,
-            flags: `attachment:${filename || 'download'}`, // Set custom filename
-            sign_url: true, // IMPORTANT: Generates a signature
-            secure: true
-        });
-
-        // Redirect the user to the signed URL
-        res.redirect(signedUrl);
-
-    } catch (error) {
-        console.error('Error generating signed URL:', error);
-        res.redirect(url);
-    }
-});
+const app = express();
+const PORT = process.env.PORT || 5001;
 
 // Middleware
 app.use(cors()); // Allow all origins for simplicity, or configure specific domains
@@ -85,8 +26,7 @@ const cacheMiddleware = (req, res, next) => {
         '/api/orders',
         '/api/enrollments',
         '/api/messages',
-        '/api/saved-notes',
-        '/api/download' // No cache for download proxy
+        '/api/saved-notes'
     ];
 
     if (noCacheRoutes.some(route => req.path.startsWith(route))) {
@@ -139,7 +79,10 @@ app.use('/api/courses', createCrudRouter(Course, { imageFields: ['image'] }));
 app.use('/api/enrollments', createCrudRouter(Enrollment));
 app.use('/api/orders', createCrudRouter(Order));
 app.use('/api/reviews', createCrudRouter(Review));
-app.use('/api/notes', createCrudRouter(Note, { imageFields: ['fileUrl', 'thumbnail'] }));
+app.use('/api/reviews', createCrudRouter(Review));
+const notesRouter = require('./routes/notes');
+app.use('/api/notes', notesRouter);
+// app.use('/api/notes', createCrudRouter(Note, { imageFields: ['fileUrl', 'thumbnail'] }));
 app.use('/api/saved-notes', createCrudRouter(SavedNote));
 app.use('/api/slides', createCrudRouter(Slide, { imageFields: ['image'] }));
 app.use('/api/books', createCrudRouter(Book, { imageFields: ['image'] }));

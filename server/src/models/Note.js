@@ -6,7 +6,11 @@ const noteSchema = new mongoose.Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },
     fileType: { type: String, enum: ['pdf', 'image', 'pptx'], required: true },
-    fileUrl: { type: String, required: true },
+    fileUrl: { type: String }, // Optional now, for backward compatibility
+    fileData: { type: Buffer }, // Binary data for the file
+    contentType: { type: String }, // MIME type
+    fileName: { type: String }, // Original filename
+    size: { type: Number }, // File size in bytes
     thumbnail: { type: String },
     createdAt: { type: String, default: () => new Date().toISOString() }
 });

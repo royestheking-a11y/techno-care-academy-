@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from "react";
-import { Upload, X, FileText, Image as ImageIcon, File, Check } from "lucide-react";
+import { Upload, X, FileText, Image as ImageIcon, File as FileIcon, Check } from "lucide-react";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../ui/dialog";
 import { Label } from "../ui/label";
@@ -12,6 +12,7 @@ interface FileUploadProps {
   maxSize?: number; // in MB
   label?: string;
   placeholder?: string;
+  onFileSelect?: (file: File) => void;
 }
 
 export function FileUpload({
@@ -20,7 +21,8 @@ export function FileUpload({
   fileType,
   maxSize = 10,
   label = "ফাইল আপলোড করুন",
-  placeholder = "ক্লিক করুন বা ড্র্যাগ করুন"
+  placeholder = "ক্লিক করুন বা ড্র্যাগ করুন",
+  onFileSelect
 }: FileUploadProps) {
   const [previewUrl, setPreviewUrl] = useState<string>(value || "");
   const [fileName, setFileName] = useState<string>("");
@@ -116,13 +118,7 @@ export function FileUpload({
 
     setIsUploading(true);
     try {
-      // Import dynamically to avoid circular dependency issues if any, or just direct import
-      const { uploadFileToCloudinary, uploadToCloudinary } = await import("../../utils/cloudinary");
-
-      let url = "";
       if (fileType === "image") {
-        // For images, we can still use the canvas resizing if we want, 
-        // but uploading the resized base64 is better done via uploadToCloudinary
         const img = new Image();
         img.onload = async () => {
           const canvas = document.createElement("canvas");
@@ -140,46 +136,47 @@ export function FileUpload({
           canvas.width = width;
           canvas.height = height;
           ctx.drawImage(img, 0, 0, width, height);
-          const processedImage = canvas.toDataURL("image/jpeg", 0.9);
 
-          try {
-            url = await uploadToCloudinary(processedImage);
-            setPreviewUrl(url);
-            setFileName(tempFileName);
-            onChange(url);
-            setShowProcessModal(false);
-            setTempFile("");
-            setTempFileName("");
-            setTempFileObj(null);
-            toast.success("ছবি আপলোড সফল হয়েছে");
-          } catch (err) {
-            console.error(err);
-            toast.error("আপলোড ব্যর্থ হয়েছে");
-          } finally {
-            setIsUploading(false);
-          }
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const processedFile = new File([blob], tempFileName, { type: "image/jpeg" });
+              if (onFileSelect) {
+                onFileSelect(processedFile);
+                onChange(URL.createObjectURL(processedFile)); // Show local preview
+              }
+
+              setPreviewUrl(tempFile);
+              setFileName(tempFileName);
+              setShowProcessModal(false);
+              setTempFile("");
+              setTempFileName("");
+              setTempFileObj(null);
+              toast.success("ফাইল সিলেক্ট করা হয়েছে");
+            }
+          }, "image/jpeg", 0.9);
+
+          setIsUploading(false);
         };
         img.src = tempFile;
-        return; // Exit here as image handling is async
       } else {
-        // For PDF/PPTX use the raw file upload
-        url = await uploadFileToCloudinary(tempFileObj);
-        // For PDF/PPTX preview, we might not have a direct image preview, 
-        // but we can show the icon.
-        setPreviewUrl(url); // using URL as preview might not show image but valid state
+        if (onFileSelect) {
+          onFileSelect(tempFileObj);
+          onChange(URL.createObjectURL(tempFileObj)); // Show local preview
+        }
+
+        setPreviewUrl(URL.createObjectURL(tempFileObj));
         setFileName(tempFileName);
-        onChange(url);
         setShowProcessModal(false);
         setTempFile("");
         setTempFileName("");
         setTempFileObj(null);
-        toast.success("ফাইল আপলোড সফল হয়েছে");
+        toast.success("ফাইল সিলেক্ট করা হয়েছে");
+        setIsUploading(false);
       }
     } catch (error) {
-      console.error("Upload error:", error);
-      toast.error("ফাইল আপলোড করতে সমস্যা হয়েছে");
-    } finally {
-      if (fileType !== 'image') setIsUploading(false);
+      console.error("File processing error:", error);
+      toast.error("ফাইল প্রসেস করতে সমস্যা হয়েছে");
+      setIsUploading(false);
     }
   };
 
@@ -199,9 +196,9 @@ export function FileUpload({
       case "image":
         return <ImageIcon className="w-8 h-8 text-blue-500" />;
       case "pptx":
-        return <File className="w-8 h-8 text-orange-500" />;
+        return <FileIcon className="w-8 h-8 text-orange-500" />;
       default:
-        return <File className="w-8 h-8 text-gray-500" />;
+        return <FileIcon className="w-8 h-8 text-gray-500" />;
     }
   };
 

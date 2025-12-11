@@ -35,6 +35,7 @@ import {
   Note
 } from "../../utils/localStorage";
 import { isCloudinaryUrl } from "../../utils/cloudinary";
+import api from "../../services/api";
 
 export function NotesManager() {
   const [activeTab, setActiveTab] = useState("pdf");
@@ -55,6 +56,7 @@ export function NotesManager() {
     thumbnail: "",
     courseId: "", // Input as string, convert to number
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     loadNotes();
@@ -85,35 +87,68 @@ export function NotesManager() {
 
   const handleAdd = async () => {
     try {
-      if (!formData.title || !formData.fileUrl || !formData.courseId) {
+      if (!formData.title || !formData.courseId) {
         toast.error("আবশ্যক তথ্য পূরণ করুন");
         return;
       }
 
-      const newNote: Omit<Note, "id" | "createdAt"> = {
-        title: formData.title,
-        description: formData.description,
-        fileType: activeTab as 'pdf' | 'image' | 'pptx',
-        fileUrl: formData.fileUrl,
-        thumbnail: formData.thumbnail || (activeTab === 'pdf' ? "https://placehold.co/150x200/png/white?text=PDF" : ""),
-        courseId: parseInt(formData.courseId),
-        views: 0,
-        downloads: 0
-      };
+      if (inputType === 'url' && !formData.fileUrl) {
+        toast.error("URL প্রদান করুন");
+        return;
+      }
 
-      await saveNote({
-        ...newNote,
-        id: Date.now(),
-        createdAt: new Date().toISOString()
-      } as Note);
+      if (inputType === 'upload' && !selectedFile) {
+        toast.error("ফাইল নির্বাচন করুন");
+        return;
+      }
+
+      const uploadData = new FormData();
+      uploadData.append('title', formData.title);
+      uploadData.append('description', formData.description);
+      uploadData.append('courseId', formData.courseId);
+      uploadData.append('fileType', activeTab);
+      uploadData.append('thumbnail', formData.thumbnail || (activeTab === 'pdf' ? "https://placehold.co/150x200/png/white?text=PDF" : ""));
+
+      if (inputType === 'upload' && selectedFile) {
+        uploadData.append('file', selectedFile);
+      } else {
+        uploadData.append('fileUrl', formData.fileUrl);
+      }
+
+      setLoading(true);
+      if (inputType === 'upload') {
+        await api.post('/notes/upload', uploadData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      } else {
+        // Fallback to regular save if just URL
+        const newNote: Omit<Note, "id" | "createdAt"> = {
+          title: formData.title,
+          description: formData.description,
+          fileType: activeTab as 'pdf' | 'image' | 'pptx',
+          fileUrl: formData.fileUrl,
+          thumbnail: formData.thumbnail || (activeTab === 'pdf' ? "https://placehold.co/150x200/png/white?text=PDF" : ""),
+          courseId: parseInt(formData.courseId),
+          views: 0,
+          downloads: 0
+        };
+        await saveNote({
+          ...newNote,
+          id: Date.now(),
+          createdAt: new Date().toISOString()
+        } as Note);
+      }
 
       toast.success("নোট যোগ করা হয়েছে");
       setShowAddModal(false);
       resetForm();
+      setSelectedFile(null);
       loadNotes();
     } catch (error) {
       console.error("Error adding note:", error);
       toast.error("নোট যোগ করতে সমস্যা হয়েছে");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -121,22 +156,34 @@ export function NotesManager() {
     if (!selectedNote) return;
 
     try {
-      await updateNote(selectedNote.id, {
-        title: formData.title,
-        description: formData.description,
-        fileUrl: formData.fileUrl,
-        thumbnail: formData.thumbnail,
-        courseId: parseInt(formData.courseId),
+      const updateData = new FormData();
+      updateData.append('title', formData.title);
+      updateData.append('description', formData.description);
+      updateData.append('courseId', formData.courseId);
+      updateData.append('thumbnail', formData.thumbnail);
+
+      if (inputType === 'upload' && selectedFile) {
+        updateData.append('file', selectedFile);
+      } else if (inputType === 'url') {
+        updateData.append('fileUrl', formData.fileUrl);
+      }
+
+      setLoading(true);
+      await api.put(`/notes/${selectedNote.id}`, updateData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
 
       toast.success("নোট আপডেট করা হয়েছে");
       setShowEditModal(false);
       setSelectedNote(null);
       resetForm();
+      setSelectedFile(null);
       loadNotes();
     } catch (error) {
       console.error("Error updating note:", error);
       toast.error("নোট আপডেট করতে সমস্যা হয়েছে");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -479,6 +526,7 @@ export function NotesManager() {
                 <FileUpload
                   value={formData.fileUrl}
                   onChange={(url) => setFormData({ ...formData, fileUrl: url })}
+                  onFileSelect={setSelectedFile}
                   fileType={activeTab as 'pdf' | 'image' | 'pptx'}
                   label="ফাইল আপলোড করুন"
                 />
