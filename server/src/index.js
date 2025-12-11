@@ -1,11 +1,69 @@
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/dbConnect');
-const https = require('https'); // Import native https module
+const cloudinary = require('cloudinary').v2;
+
 require('dotenv').config();
 
-const app = express();
-const PORT = process.env.PORT || 5001;
+// Cloudinary Config
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'deal7ji7s',
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Proxy download route to fix Cloudinary 401 errors using Signed URLs
+app.get('/api/download', (req, res) => {
+    const { url, filename } = req.query;
+
+    if (!url) {
+        return res.status(400).send('Missing url parameter');
+    }
+
+    try {
+        // Extract public_id and other details from the URL
+        // Example: https://res.cloudinary.com/cloud_name/image/upload/v1234/folder/file.pdf
+        const matches = url.match(/\/upload\/(?:v\d+\/)?(.+)$/);
+
+        if (!matches || !matches[1]) {
+            return res.redirect(url);
+        }
+
+        let publicIdWithExtension = matches[1];
+
+        // Split public_id and extension/format
+        const lastDotIndex = publicIdWithExtension.lastIndexOf('.');
+        let publicId = publicIdWithExtension;
+        let format = null;
+
+        if (lastDotIndex !== -1) {
+            publicId = publicIdWithExtension.substring(0, lastDotIndex);
+            format = publicIdWithExtension.substring(lastDotIndex + 1);
+        }
+
+        // Determine resource type (default to image, but try to detect based on url content)
+        // Cloudinary URLs usually have /image/upload or /raw/upload or /video/upload
+        let resourceType = 'image';
+        if (url.includes('/raw/')) resourceType = 'raw';
+        else if (url.includes('/video/')) resourceType = 'video';
+
+        // Generate Signed URL with "attachment" flag to force download
+        const signedUrl = cloudinary.url(publicId, {
+            resource_type: resourceType,
+            format: format,
+            flags: `attachment:${filename || 'download'}`, // Set custom filename
+            sign_url: true, // IMPORTANT: Generates a signature
+            secure: true
+        });
+
+        // Redirect the user to the signed URL
+        res.redirect(signedUrl);
+
+    } catch (error) {
+        console.error('Error generating signed URL:', error);
+        res.redirect(url);
+    }
+});
 
 // Middleware
 app.use(cors()); // Allow all origins for simplicity, or configure specific domains
@@ -43,60 +101,6 @@ const cacheMiddleware = (req, res, next) => {
 };
 
 app.use(cacheMiddleware);
-
-// Proxy download route to fix Cloudinary 401 errors and force download
-app.get('/api/download', (req, res) => {
-    const { url, filename } = req.query;
-
-    if (!url) {
-        return res.status(400).send('Missing url parameter');
-    }
-
-    // Helper to handle redirects and stream file
-    const fetchUrl = (fileUrl, redirectCount = 0) => {
-        if (redirectCount > 5) {
-            console.error('Too many redirects');
-            return res.status(500).send('Too many redirects');
-        }
-
-        const client = fileUrl.startsWith('https') ? https : require('http');
-
-        client.get(fileUrl, (response) => {
-            // Handle Redirects (301, 302, 303, 307, 308)
-            if ([301, 302, 303, 307, 308].includes(response.statusCode) && response.headers.location) {
-                return fetchUrl(response.headers.location, redirectCount + 1);
-            }
-
-            // Handle Errors
-            if (response.statusCode !== 200) {
-                console.error(`Download failed with status: ${response.statusCode}`);
-                return res.status(response.statusCode).send('Failed to fetch file');
-            }
-
-            // Forward Content-Type and Content-Length for mobile compatibility
-            if (response.headers['content-type']) {
-                res.setHeader('Content-Type', response.headers['content-type']);
-            }
-            if (response.headers['content-length']) {
-                res.setHeader('Content-Length', response.headers['content-length']);
-            }
-
-            // Set Content-Disposition to force download
-            const encodedFilename = filename ? encodeURIComponent(filename) : 'download';
-            res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodedFilename}`);
-
-            // Pipe the stream
-            response.pipe(res);
-        }).on('error', (err) => {
-            console.error('Download proxy error:', err);
-            if (!res.headersSent) {
-                res.status(500).send('Error downloading file');
-            }
-        });
-    };
-
-    fetchUrl(url);
-});
 
 // Database Connection Middleware
 // This ensures DB is connected before handling any request in serverless environment
