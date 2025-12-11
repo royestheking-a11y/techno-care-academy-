@@ -83,3 +83,29 @@ export function isBase64Image(url: string): boolean {
 export function isCloudinaryUrl(url: string): boolean {
     return typeof url === 'string' && url.includes('cloudinary.com');
 }
+
+// Upload generic file to Cloudinary (auto detects type: image, video, raw)
+export async function uploadFileToCloudinary(file: File | Blob): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+    formData.append('folder', CLOUDINARY_CONFIG.folder);
+    formData.append('resource_type', 'auto');
+
+    const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/auto/upload`,
+        {
+            method: 'POST',
+            body: formData,
+        }
+    );
+
+    if (!response.ok) {
+        const error = await response.json();
+        console.error('Cloudinary upload error:', error);
+        throw new Error(`Upload failed: ${error.error?.message || 'Unknown error'}`);
+    }
+
+    const data = await response.json();
+    return data.secure_url;
+}

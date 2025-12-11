@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { ImageUpload } from "./ImageUpload";
+import { FileUpload } from "./FileUpload";
 import {
   getNotes,
   saveNote,
@@ -33,6 +34,7 @@ import {
   deleteNote,
   Note
 } from "../../utils/localStorage";
+import { isCloudinaryUrl } from "../../utils/cloudinary";
 
 export function NotesManager() {
   const [activeTab, setActiveTab] = useState("pdf");
@@ -43,6 +45,7 @@ export function NotesManager() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const [inputType, setInputType] = useState<'url' | 'upload'>('url');
 
   // Form Data
   const [formData, setFormData] = useState({
@@ -161,6 +164,7 @@ export function NotesManager() {
       thumbnail: note.thumbnail || "",
       courseId: note.courseId.toString(),
     });
+    setInputType(isCloudinaryUrl(note.fileUrl) ? 'upload' : 'url');
     setShowEditModal(true);
   };
 
@@ -206,6 +210,7 @@ export function NotesManager() {
         <Button
           onClick={() => {
             resetForm();
+            setInputType('url');
             setShowAddModal(true);
           }}
           className="bg-gradient-to-r from-[#285046] to-[#2F6057] hover:from-[#2F6057] hover:to-[#285046] text-white shadow-lg"
@@ -434,16 +439,50 @@ export function NotesManager() {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label>ফাইল URL *</Label>
-              <Input
-                value={formData.fileUrl}
-                onChange={(e) => setFormData({ ...formData, fileUrl: e.target.value })}
-                placeholder="Google Drive বা অন্য লিংক"
-              />
-              <p className="text-xs text-gray-500">
-                Direct download link বা view link ব্যবহার করুন
-              </p>
+            <div className="space-y-3">
+              <Label>ফাইল সোর্স *</Label>
+              <div className="flex bg-gray-100 p-1 rounded-lg w-fit">
+                <button
+                  type="button"
+                  onClick={() => setInputType('url')}
+                  className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${inputType === 'url'
+                    ? 'bg-white text-[#285046] shadow-sm'
+                    : 'text-gray-500 hover:text-[#285046]'
+                    }`}
+                >
+                  লিংক / URL
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInputType('upload')}
+                  className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${inputType === 'upload'
+                    ? 'bg-white text-[#285046] shadow-sm'
+                    : 'text-gray-500 hover:text-[#285046]'
+                    }`}
+                >
+                  ফাইল আপলোড
+                </button>
+              </div>
+
+              {inputType === 'url' ? (
+                <div className="space-y-2">
+                  <Input
+                    value={formData.fileUrl}
+                    onChange={(e) => setFormData({ ...formData, fileUrl: e.target.value })}
+                    placeholder={activeTab === 'pptx' ? "Google Slides link..." : "Drive link / URL..."}
+                  />
+                  <p className="text-xs text-gray-500">
+                    Direct download link বা view link ব্যবহার করুন
+                  </p>
+                </div>
+              ) : (
+                <FileUpload
+                  value={formData.fileUrl}
+                  onChange={(url) => setFormData({ ...formData, fileUrl: url })}
+                  fileType={activeTab as 'pdf' | 'image' | 'pptx'}
+                  label="ফাইল আপলোড করুন"
+                />
+              )}
             </div>
 
             {activeTab === 'image' && (

@@ -28,6 +28,7 @@ export function FileUpload({
   const [tempFile, setTempFile] = useState<string>("");
   const [tempFileName, setTempFileName] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const getAcceptedTypes = () => {
@@ -68,9 +69,12 @@ export function FileUpload({
     return true;
   };
 
+  const [tempFileObj, setTempFileObj] = useState<File | null>(null);
+
   const handleFileSelect = useCallback((file: File) => {
     if (!validateFile(file)) return;
 
+    setTempFileObj(file);
     const reader = new FileReader();
     reader.onloadend = () => {
       const result = reader.result as string;
@@ -91,7 +95,7 @@ export function FileUpload({
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     const file = e.dataTransfer.files[0];
     if (file) {
       handleFileSelect(file);
@@ -107,50 +111,75 @@ export function FileUpload({
     setIsDragging(false);
   };
 
-  const handleProcess = () => {
-    if (!tempFile) return;
+  const handleProcess = async () => {
+    if (!tempFile || !tempFileObj) return;
 
-    // For images, we can do auto-resize
-    if (fileType === "image") {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
+    setIsUploading(true);
+    try {
+      // Import dynamically to avoid circular dependency issues if any, or just direct import
+      const { uploadFileToCloudinary, uploadToCloudinary } = await import("../../utils/cloudinary");
 
-        let width = img.width;
-        let height = img.height;
+      let url = "";
+      if (fileType === "image") {
+        // For images, we can still use the canvas resizing if we want, 
+        // but uploading the resized base64 is better done via uploadToCloudinary
+        const img = new Image();
+        img.onload = async () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return;
 
-        // Auto-resize to max 1200px width while maintaining aspect ratio
-        const maxWidth = 1200;
-        if (width > maxWidth) {
-          height = (height * maxWidth) / width;
-          width = maxWidth;
-        }
+          let width = img.width;
+          let height = img.height;
+          const maxWidth = 1200;
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
 
-        canvas.width = width;
-        canvas.height = height;
-        ctx.drawImage(img, 0, 0, width, height);
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+          const processedImage = canvas.toDataURL("image/jpeg", 0.9);
 
-        const processedImage = canvas.toDataURL("image/jpeg", 0.9);
-        setPreviewUrl(processedImage);
+          try {
+            url = await uploadToCloudinary(processedImage);
+            setPreviewUrl(url);
+            setFileName(tempFileName);
+            onChange(url);
+            setShowProcessModal(false);
+            setTempFile("");
+            setTempFileName("");
+            setTempFileObj(null);
+            toast.success("ছবি আপলোড সফল হয়েছে");
+          } catch (err) {
+            console.error(err);
+            toast.error("আপলোড ব্যর্থ হয়েছে");
+          } finally {
+            setIsUploading(false);
+          }
+        };
+        img.src = tempFile;
+        return; // Exit here as image handling is async
+      } else {
+        // For PDF/PPTX use the raw file upload
+        url = await uploadFileToCloudinary(tempFileObj);
+        // For PDF/PPTX preview, we might not have a direct image preview, 
+        // but we can show the icon.
+        setPreviewUrl(url); // using URL as preview might not show image but valid state
         setFileName(tempFileName);
-        onChange(processedImage);
+        onChange(url);
         setShowProcessModal(false);
         setTempFile("");
         setTempFileName("");
+        setTempFileObj(null);
         toast.success("ফাইল আপলোড সফল হয়েছে");
-      };
-      img.src = tempFile;
-    } else {
-      // For PDF and PPT, just store the base64
-      setPreviewUrl(tempFile);
-      setFileName(tempFileName);
-      onChange(tempFile);
-      setShowProcessModal(false);
-      setTempFile("");
-      setTempFileName("");
-      toast.success("ফাইল আপলোড সফল হয়েছে");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("ফাইল আপলোড করতে সমস্যা হয়েছে");
+    } finally {
+      if (fileType !== 'image') setIsUploading(false);
     }
   };
 
@@ -192,7 +221,7 @@ export function FileUpload({
   return (
     <div className="space-y-2">
       {label && <Label className="text-[#1A202C]">{label}</Label>}
-      
+
       {/* Upload Area */}
       <div
         onClick={() => !previewUrl && fileInputRef.current?.click()}
@@ -201,10 +230,10 @@ export function FileUpload({
         onDragLeave={handleDragLeave}
         className={`
           relative rounded-xl border-2 border-dashed transition-all cursor-pointer
-          ${isDragging 
-            ? "border-[#285046] bg-[#285046]/5" 
-            : previewUrl 
-              ? "border-gray-200" 
+          ${isDragging
+            ? "border-[#285046] bg-[#285046]/5"
+            : previewUrl
+              ? "border-gray-200"
               : "border-gray-300 hover:border-[#285046] hover:bg-gray-50"
           }
           ${!previewUrl ? "p-8" : "p-4"}
@@ -314,7 +343,7 @@ export function FileUpload({
               ফাইল প্রসেস করুন
             </DialogTitle>
           </DialogHeader>
-          
+
           {tempFile && (
             <div className="space-y-4">
               {fileType === "image" ? (
