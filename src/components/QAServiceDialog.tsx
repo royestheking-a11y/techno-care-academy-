@@ -78,15 +78,15 @@ export function QAServiceDialog({ open, onOpenChange }: QAServiceDialogProps) {
     {
       icon: Phone,
       title: "ফোন করুন",
-      value: "+880 1234-567890",
-      action: "tel:+8801234567890",
+      value: "+880 1629-648302",
+      action: "tel:+8801629648302",
       color: "from-blue-500 to-cyan-500"
     },
     {
       icon: Mail,
       title: "ইমেইল পাঠান",
-      value: "support@technocare.edu.bd",
-      action: "mailto:support@technocare.edu.bd",
+      value: "technocareacademy.edu@gmail.com",
+      action: "mailto:technocareacademy.edu@gmail.com",
       color: "from-green-500 to-emerald-500"
     },
     {
@@ -100,7 +100,7 @@ export function QAServiceDialog({ open, onOpenChange }: QAServiceDialogProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Save to localStorage
     const messages = JSON.parse(localStorage.getItem("messages") || "[]");
     messages.push({
@@ -112,7 +112,7 @@ export function QAServiceDialog({ open, onOpenChange }: QAServiceDialogProps) {
     localStorage.setItem("messages", JSON.stringify(messages));
 
     toast.success("আপনার বার্তা পাঠানো হয়েছে! শীঘ্রই আমরা যোগাযোগ করব।");
-    
+
     // Reset form
     setFormData({
       name: "",
@@ -177,7 +177,7 @@ export function QAServiceDialog({ open, onOpenChange }: QAServiceDialogProps) {
                 </div>
                 <h4 className="text-xl text-[#1A202C] mb-2">{method.title}</h4>
                 <p className="text-sm text-[#555555] mb-4">{method.value}</p>
-                <Button 
+                <Button
                   className={`w-full bg-gradient-to-r ${method.color} hover:opacity-90 text-white`}
                   onClick={() => {
                     if (method.action !== "#") {
@@ -254,7 +254,7 @@ export function QAServiceDialog({ open, onOpenChange }: QAServiceDialogProps) {
               />
             </div>
 
-            <Button 
+            <Button
               type="submit"
               className="w-full bg-gradient-to-r from-[#285046] to-[#2F6057] hover:from-[#2F6057] hover:to-[#285046] text-white text-lg py-6"
             >
@@ -273,7 +273,7 @@ export function QAServiceDialog({ open, onOpenChange }: QAServiceDialogProps) {
               ২৪ ঘণ্টা, ৭ দিন - সপ্তাহজুড়ে আমরা আপনার সেবায় নিয়োজিত
             </p>
             <p className="text-white/80 text-sm mt-2">
-              ফোন সাপোর্ট: সকাল ৮টা - রাত ১০টা | অনলাইন চ্যাট: ২৪/৭
+              ফোন সাপোর্ট: সকাল ৮টা - রাত ৭টা | অনলাইন চ্যাট: ২৪/৭
             </p>
           </div>
         </Card>
