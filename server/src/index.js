@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/dbConnect');
+const https = require('https'); // Import native https module
 require('dotenv').config();
 
 const app = express();
@@ -26,7 +27,8 @@ const cacheMiddleware = (req, res, next) => {
         '/api/orders',
         '/api/enrollments',
         '/api/messages',
-        '/api/saved-notes'
+        '/api/saved-notes',
+        '/api/download' // No cache for download proxy
     ];
 
     if (noCacheRoutes.some(route => req.path.startsWith(route))) {
@@ -41,6 +43,26 @@ const cacheMiddleware = (req, res, next) => {
 };
 
 app.use(cacheMiddleware);
+
+// Proxy download route to fix Cloudinary 401 errors and force download
+app.get('/api/download', (req, res) => {
+    const { url, filename } = req.query;
+
+    if (!url) {
+        return res.status(400).send('Missing url parameter');
+    }
+
+    // Set headers to force download with proper encoding for Bengali characters
+    const encodedFilename = filename ? encodeURIComponent(filename) : 'download';
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodedFilename}`);
+
+    https.get(url, (stream) => {
+        stream.pipe(res);
+    }).on('error', (err) => {
+        console.error('Download proxy error:', err);
+        res.status(500).send('Error downloading file');
+    });
+});
 
 // Database Connection Middleware
 // This ensures DB is connected before handling any request in serverless environment
