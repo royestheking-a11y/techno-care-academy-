@@ -479,8 +479,12 @@ export function FloatingChat() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-16 sm:bottom-20 right-2 sm:right-4 md:right-8 z-50 w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] md:w-96 bg-white rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden"
-            style={{ maxHeight: "calc(100vh - 100px)" }}
+            className="fixed z-50 w-[calc(100vw-2rem)] sm:w-96 max-w-[400px] bg-white rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden"
+            style={{
+              maxHeight: "calc(100vh - 120px)",
+              bottom: "calc(5rem + env(safe-area-inset-bottom))",
+              right: "calc(1rem + env(safe-area-inset-right))"
+            }}
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-[#285046] to-[#2F6057] p-3 sm:p-4 flex items-center justify-between">
@@ -641,9 +645,11 @@ export function FloatingChat() {
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-4 sm:bottom-6 right-3 sm:right-4 md:right-8 z-50 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full p-3 sm:p-4 shadow-2xl"
+        className="fixed z-50 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full p-3 sm:p-4 shadow-2xl"
         style={{
           animation: isOpen ? "none" : "bounce 2s infinite",
+          bottom: "calc(1rem + env(safe-area-inset-bottom))",
+          right: "calc(1rem + env(safe-area-inset-right))"
         }}
       >
         <AnimatePresence mode="wait">
