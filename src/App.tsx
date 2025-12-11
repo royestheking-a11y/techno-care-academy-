@@ -414,7 +414,7 @@ export default function App() {
       {showSplash && (
         <SplashScreen
           onComplete={() => setShowSplash(false)}
-          minDuration={2500}
+          minDuration={2000}
           isDataLoaded={isDataLoaded}
         />
       )}
