@@ -52,16 +52,50 @@ app.get('/api/download', (req, res) => {
         return res.status(400).send('Missing url parameter');
     }
 
-    // Set headers to force download with proper encoding for Bengali characters
-    const encodedFilename = filename ? encodeURIComponent(filename) : 'download';
-    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodedFilename}`);
+    // Helper to handle redirects and stream file
+    const fetchUrl = (fileUrl, redirectCount = 0) => {
+        if (redirectCount > 5) {
+            console.error('Too many redirects');
+            return res.status(500).send('Too many redirects');
+        }
 
-    https.get(url, (stream) => {
-        stream.pipe(res);
-    }).on('error', (err) => {
-        console.error('Download proxy error:', err);
-        res.status(500).send('Error downloading file');
-    });
+        const client = fileUrl.startsWith('https') ? https : require('http');
+
+        client.get(fileUrl, (response) => {
+            // Handle Redirects (301, 302, 303, 307, 308)
+            if ([301, 302, 303, 307, 308].includes(response.statusCode) && response.headers.location) {
+                return fetchUrl(response.headers.location, redirectCount + 1);
+            }
+
+            // Handle Errors
+            if (response.statusCode !== 200) {
+                console.error(`Download failed with status: ${response.statusCode}`);
+                return res.status(response.statusCode).send('Failed to fetch file');
+            }
+
+            // Forward Content-Type and Content-Length for mobile compatibility
+            if (response.headers['content-type']) {
+                res.setHeader('Content-Type', response.headers['content-type']);
+            }
+            if (response.headers['content-length']) {
+                res.setHeader('Content-Length', response.headers['content-length']);
+            }
+
+            // Set Content-Disposition to force download
+            const encodedFilename = filename ? encodeURIComponent(filename) : 'download';
+            res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodedFilename}`);
+
+            // Pipe the stream
+            response.pipe(res);
+        }).on('error', (err) => {
+            console.error('Download proxy error:', err);
+            if (!res.headersSent) {
+                res.status(500).send('Error downloading file');
+            }
+        });
+    };
+
+    fetchUrl(url);
 });
 
 // Database Connection Middleware
