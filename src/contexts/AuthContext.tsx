@@ -27,36 +27,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const initAuth = async () => {
       // Check if user is logged in via local storage cache
       const savedUser = localStorage.getItem('currentUser');
+
       if (savedUser) {
         try {
           const parsedUser = JSON.parse(savedUser);
-          // Verify with backend
+
+          // 1. OPTIMISTIC UPDATE: Log them in immediately
+          // This removes the delay/spinner on refresh
+          setUser(parsedUser);
+          setIsLoading(false); // Unblock the UI immediately
+
+          // 2. BACKGROUND VERIFICATION
+          // Verify with backend silently
           try {
-            // We can use the generic GET /users/:id
             const response = await api.get(`/users/${parsedUser.id}`);
             const freshUser = response.data;
 
             if (freshUser) {
-              setUser(freshUser);
+              // Note: We don't need to re-set user if data is identical, 
+              // but we should save if it changed
               if (JSON.stringify(freshUser) !== JSON.stringify(parsedUser)) {
+                setUser(freshUser);
                 localStorage.setItem('currentUser', JSON.stringify(freshUser));
               }
               await checkVerificationStatus(freshUser);
             } else {
-              // User not found in DB
+              // User not found in DB - force logout
+              console.warn("Background auth check failed: User not found");
               logout();
             }
           } catch (err) {
-            console.error("User validation failed", err);
-            // If sensitive, logout. For now, keep session if just network error?
-            // But if 404, logout.
-            logout();
+            console.warn("Background auth check network error", err);
+            // We DON'T logout here, because it might just be a temporary network issue.
+            // The user can continue using the app with cached data.
           }
         } catch (e) {
           console.error("Failed to parse user from local storage", e);
+          setIsLoading(false);
         }
+      } else {
+        // No user in local storage
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     initAuth();

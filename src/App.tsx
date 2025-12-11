@@ -23,10 +23,10 @@ import { SplashScreen } from "./components/SplashScreen";
 import { Loader2 } from "lucide-react";
 
 // Lazy Load Pages to reduce initial bundle size
+import { LoginPage } from "./components/auth/LoginPage";
+import { SignupPage } from "./components/auth/SignupPage";
 const AdminPanel = lazy(() => import("./components/admin/AdminPanel").then(module => ({ default: module.AdminPanel })));
 const UserDashboard = lazy(() => import("./components/UserDashboard").then(module => ({ default: module.UserDashboard })));
-const LoginPage = lazy(() => import("./components/auth/LoginPage").then(module => ({ default: module.LoginPage })));
-const SignupPage = lazy(() => import("./components/auth/SignupPage").then(module => ({ default: module.SignupPage })));
 const ForgotPasswordPage = lazy(() => import("./components/auth/ForgotPasswordPage").then(module => ({ default: module.ForgotPasswordPage })));
 const TeachersPage = lazy(() => import("./components/pages/TeachersPage").then(module => ({ default: module.TeachersPage })));
 const BooksPage = lazy(() => import("./components/pages/BooksPage").then(module => ({ default: module.BooksPage })));
@@ -264,13 +264,11 @@ export default function App() {
     return (
       <AuthProvider>
         <Toaster position="top-right" />
-        <Suspense fallback={<PageLoader />}>
-          <LoginPage
-            onNavigateToSignup={() => navigateTo("signup")}
-            onNavigateToHome={() => navigateTo("home")}
-            onNavigateToForgotPassword={() => navigateTo("forgot-password")}
-          />
-        </Suspense>
+        <LoginPage
+          onNavigateToSignup={() => navigateTo("signup")}
+          onNavigateToHome={() => navigateTo("home")}
+          onNavigateToForgotPassword={() => navigateTo("forgot-password")}
+        />
       </AuthProvider>
     );
   }
@@ -279,9 +277,7 @@ export default function App() {
     return (
       <AuthProvider>
         <Toaster position="top-right" />
-        <Suspense fallback={<PageLoader />}>
-          <SignupPage onNavigateToLogin={() => navigateTo("login")} onNavigateToHome={() => navigateTo("home")} />
-        </Suspense>
+        <SignupPage onNavigateToLogin={() => navigateTo("login")} onNavigateToHome={() => navigateTo("home")} />
       </AuthProvider>
     );
   }
