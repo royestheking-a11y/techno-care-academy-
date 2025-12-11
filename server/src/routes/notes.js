@@ -15,24 +15,33 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     try {
         const { title, description, courseId, fileType, thumbnail } = req.body;
 
-        if (!req.file) {
-            return res.status(400).json({ message: 'File is required' });
+        if (!req.file && !req.body.fileUrl) {
+            return res.status(400).json({ message: 'File or File URL is required' });
         }
 
-        const newNote = new Note({
+        const noteData = {
             title,
             description,
             courseId,
             fileType,
-            thumbnail,
-            fileData: req.file.buffer,
-            contentType: req.file.mimetype,
-            fileName: req.file.originalname,
-            size: req.file.size
-        });
+            thumbnail
+        };
 
-        // Auto-generate fileUrl for download
-        newNote.fileUrl = `/api/notes/${newNote._id}/download`;
+        if (req.file) {
+            noteData.fileData = req.file.buffer;
+            noteData.contentType = req.file.mimetype;
+            noteData.fileName = req.file.originalname;
+            noteData.size = req.file.size;
+        } else {
+            noteData.fileUrl = req.body.fileUrl;
+        }
+
+        const newNote = new Note(noteData);
+
+        // If file was uploaded, set the download URL using the real _id
+        if (req.file) {
+            newNote.fileUrl = `/api/notes/${newNote._id}/download`;
+        }
 
         const savedNote = await newNote.save();
 

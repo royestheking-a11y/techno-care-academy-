@@ -67,7 +67,7 @@ export interface Order {
 }
 
 export interface Note {
-  id: number;
+  id: string; // Changed from number to string for MongoDB ObjectId
   courseId: number;
   title: string;
   description: string;
@@ -348,7 +348,10 @@ export const getNotes = async (): Promise<Note[]> => {
   try {
     return await cachedFetch(CACHE_KEYS.NOTES, async () => {
       const response = await api.get('/notes');
-      return response.data;
+      return response.data.map((note: any) => ({
+        ...note,
+        id: note._id || note.id
+      }));
     });
   } catch (error) {
     console.warn('API unavailable, returning empty notes:', error);
@@ -361,12 +364,12 @@ export const saveNote = async (note: Note) => {
   return response.data;
 };
 
-export const updateNote = async (id: number, updates: Partial<Note>) => {
+export const updateNote = async (id: string, updates: Partial<Note>) => {
   const response = await api.put(`/notes/${id}`, updates);
   return response.data;
 };
 
-export const deleteNote = async (id: number) => {
+export const deleteNote = async (id: string) => {
   await api.delete(`/notes/${id}`);
 };
 

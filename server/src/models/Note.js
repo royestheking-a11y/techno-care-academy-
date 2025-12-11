@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const noteSchema = new mongoose.Schema({
-    id: { type: Number, required: true, unique: true },
+    // id: { type: Number, required: true, unique: true }, // Removed to use MongoDB _id
     courseId: { type: Number, required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },

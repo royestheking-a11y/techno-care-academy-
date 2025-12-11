@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "../ui/dialog";
 import {
   FileText,
@@ -116,28 +117,9 @@ export function NotesManager() {
       }
 
       setLoading(true);
-      if (inputType === 'upload') {
-        await api.post('/notes/upload', uploadData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-      } else {
-        // Fallback to regular save if just URL
-        const newNote: Omit<Note, "id" | "createdAt"> = {
-          title: formData.title,
-          description: formData.description,
-          fileType: activeTab as 'pdf' | 'image' | 'pptx',
-          fileUrl: formData.fileUrl,
-          thumbnail: formData.thumbnail || (activeTab === 'pdf' ? "https://placehold.co/150x200/png/white?text=PDF" : ""),
-          courseId: parseInt(formData.courseId),
-          views: 0,
-          downloads: 0
-        };
-        await saveNote({
-          ...newNote,
-          id: Date.now(),
-          createdAt: new Date().toISOString()
-        } as Note);
-      }
+      await api.post('/notes/upload', uploadData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
 
       toast.success("নোট যোগ করা হয়েছে");
       setShowAddModal(false);
@@ -455,6 +437,11 @@ export function NotesManager() {
                 </>
               )}
             </DialogTitle>
+            <div className="sr-only">
+              <DialogDescription>
+                {showAddModal ? "নতুন নোট তৈরির ফর্ম" : "নোট সম্পাদনার ফর্ম"}
+              </DialogDescription>
+            </div>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -571,6 +558,9 @@ export function NotesManager() {
               <Trash2 className="w-5 h-5" />
               নিশ্চিত করুন
             </DialogTitle>
+            <DialogDescription>
+              নোট মুছে ফেলার নিশ্চিতকরণ
+            </DialogDescription>
           </DialogHeader>
           <p className="text-[#555555]">
             আপনি কি নিশ্চিত যে এই নোটটি মুছে ফেলতে চান? এটি আর ফিরিয়ে আনা যাবে না।
