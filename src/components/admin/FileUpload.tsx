@@ -69,12 +69,12 @@ export function FileUpload({
     return true;
   };
 
-  const [tempFileObj, setTempFileObj] = useState<File | null>(null);
+  // const [tempFileObj, setTempFileObj] = useState<File | null>(null); // Not needed for Base64
 
   const handleFileSelect = useCallback((file: File) => {
     if (!validateFile(file)) return;
 
-    setTempFileObj(file);
+    // setTempFileObj(file);
     const reader = new FileReader();
     reader.onloadend = () => {
       const result = reader.result as string;
@@ -112,74 +112,50 @@ export function FileUpload({
   };
 
   const handleProcess = async () => {
-    if (!tempFile || !tempFileObj) return;
+    if (!tempFile) return;
 
-    setIsUploading(true);
-    try {
-      // Import dynamically to avoid circular dependency issues if any, or just direct import
-      const { uploadFileToCloudinary, uploadToCloudinary } = await import("../../utils/cloudinary");
+    // Direct Base64 Storage (MongoDB)
+    // No Cloudinary upload needed. content is already in tempFile (Base64)
 
-      let url = "";
-      if (fileType === "image") {
-        // For images, we can still use the canvas resizing if we want, 
-        // but uploading the resized base64 is better done via uploadToCloudinary
-        const img = new Image();
-        img.onload = async () => {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-          if (!ctx) return;
+    // For images, we can still optimize/resize using canvas before saving
+    if (fileType === "image") {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
 
-          let width = img.width;
-          let height = img.height;
-          const maxWidth = 1200;
-          if (width > maxWidth) {
-            height = (height * maxWidth) / width;
-            width = maxWidth;
-          }
+        let width = img.width;
+        let height = img.height;
+        const maxWidth = 1200;
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
 
-          canvas.width = width;
-          canvas.height = height;
-          ctx.drawImage(img, 0, 0, width, height);
-          const processedImage = canvas.toDataURL("image/jpeg", 0.9);
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+        const processedImage = canvas.toDataURL("image/jpeg", 0.9);
 
-          try {
-            url = await uploadToCloudinary(processedImage);
-            setPreviewUrl(url);
-            setFileName(tempFileName);
-            onChange(url);
-            setShowProcessModal(false);
-            setTempFile("");
-            setTempFileName("");
-            setTempFileObj(null);
-            toast.success("ছবি আপলোড সফল হয়েছে");
-          } catch (err) {
-            console.error(err);
-            toast.error("আপলোড ব্যর্থ হয়েছে");
-          } finally {
-            setIsUploading(false);
-          }
-        };
-        img.src = tempFile;
-        return; // Exit here as image handling is async
-      } else {
-        // For PDF/PPTX use the raw file upload
-        url = await uploadFileToCloudinary(tempFileObj);
-        // For PDF/PPTX preview, we might not have a direct image preview, 
-        // but we can show the icon.
-        setPreviewUrl(url); // using URL as preview might not show image but valid state
+        setPreviewUrl(processedImage);
         setFileName(tempFileName);
-        onChange(url);
+        onChange(processedImage); // Save Base64 directly
         setShowProcessModal(false);
         setTempFile("");
         setTempFileName("");
-        setTempFileObj(null);
-        toast.success("ফাইল আপলোড সফল হয়েছে");
-      }
-    } catch (error) {
-      console.error("Upload error:", error);
-      toast.error("ফাইল আপলোড করতে সমস্যা হয়েছে");
-    } finally {
-      if (fileType !== 'image') setIsUploading(false);
+        toast.success("ফাইল তৈরি হয়েছে (সেভ করতে 'আপডেট/যোগ' চাপুন)");
+      };
+      img.src = tempFile;
+    } else {
+      // PDF / PPTX - Use raw Base64
+      setPreviewUrl(tempFile);
+      setFileName(tempFileName);
+      onChange(tempFile); // Save Base64 directly
+      setShowProcessModal(false);
+      setTempFile("");
+      setTempFileName("");
+      toast.success("ফাইল তৈরি হয়েছে (সেভ করতে 'আপডেট/যোগ' চাপুন)");
     }
   };
 
