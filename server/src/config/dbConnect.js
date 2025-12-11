@@ -15,6 +15,7 @@ async function connectDB() {
     if (!cached.promise) {
         const opts = {
             bufferCommands: false,
+            maxPoolSize: 10, // Restrict pool size for serverless/M0 limits
         };
 
         if (!process.env.MONGODB_URI) {
