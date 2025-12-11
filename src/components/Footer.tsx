@@ -5,13 +5,57 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { toast } from "sonner";
+import { useAuth } from "../contexts/AuthContext";
+import { getUserEnrollments } from "../utils/localStorage";
+import { useEffect } from "react";
 
 export function Footer() {
+  const { isAuthenticated, user } = useAuth();
+  const [hasEnrollment, setHasEnrollment] = useState(false);
+
   const [showAdminDialog, setShowAdminDialog] = useState(false);
   const [adminCredentials, setAdminCredentials] = useState({
     username: "",
     password: "",
   });
+
+  useEffect(() => {
+    const checkEnrollment = async () => {
+      if (user) {
+        try {
+          const enrollments = await getUserEnrollments(user.id);
+          const confirmed = enrollments.some(e => e.status === 'confirmed');
+          setHasEnrollment(confirmed);
+        } catch (e) {
+          console.error("Error checking enrollment in footer", e);
+        }
+      } else {
+        setHasEnrollment(false);
+      }
+    };
+    checkEnrollment();
+  }, [user]);
+
+  const handleNotesClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if (!isAuthenticated) {
+      toast.error("লগইন প্রয়োজন", {
+        description: "নোটস দেখতে অনুগ্রহ করে লগইন করুন"
+      });
+      window.location.hash = "login";
+      return;
+    }
+
+    if (!hasEnrollment) {
+      toast.error("এনরোলমেন্ট প্রয়োজন", {
+        description: "নোটস দেখতে যেকোনো একটি কোর্সে এনরোল থাকতে হবে"
+      });
+      return;
+    }
+
+    window.location.hash = "notes";
+  };
 
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,7 +140,8 @@ export function Footer() {
                 </li>
                 <li>
                   <a
-                    href="#notes"
+                    href="#"
+                    onClick={handleNotesClick}
                     className="text-white/70 hover:text-[#FFB703] transition-all duration-300 inline-flex items-center gap-2 group"
                   >
                     <span className="w-0 h-0.5 bg-[#FFB703] group-hover:w-4 transition-all duration-300"></span>
