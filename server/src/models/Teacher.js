@@ -10,7 +10,9 @@ const teacherSchema = new mongoose.Schema({
     students: { type: String },
     initial: { type: String },
     image: { type: String, required: true },
-    category: { type: String, required: true }
+    category: { type: String, required: true },
+    enName: { type: String }, // Added for English search
+    enSubject: { type: String } // Added for English search
 });
 
 module.exports = mongoose.model('Teacher', teacherSchema);

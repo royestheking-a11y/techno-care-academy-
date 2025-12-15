@@ -5,6 +5,7 @@ import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { toast } from "sonner";
+import { getLiveClasses } from "../../utils/localStorage";
 
 interface LiveClassesPageProps {
   onBackToHome: () => void;
@@ -13,17 +14,23 @@ interface LiveClassesPageProps {
 export function LiveClassesPage({ onBackToHome }: LiveClassesPageProps) {
   const [liveClasses, setLiveClasses] = useState<any[]>([]);
   const [upcomingClasses, setUpcomingClasses] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadLiveClasses();
   }, []);
 
-  const loadLiveClasses = () => {
-    const stored = localStorage.getItem("liveClasses");
-    if (stored) {
-      const all = JSON.parse(stored);
-      setLiveClasses(all.filter((c: any) => c.isLive));
-      setUpcomingClasses(all.filter((c: any) => !c.isLive));
+  const loadLiveClasses = async () => {
+    try {
+      setLoading(true);
+      const all = await getLiveClasses();
+      setLiveClasses(all.filter((c: any) => c.isActive));
+      setUpcomingClasses(all.filter((c: any) => !c.isActive));
+    } catch (error) {
+      console.error("Error loading live classes:", error);
+      toast.error("লাইভ ক্লাস লোড করতে সমস্যা হয়েছে");
+    } finally {
+      setLoading(false);
     }
   };
 

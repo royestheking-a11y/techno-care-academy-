@@ -77,12 +77,13 @@ export interface Note {
   createdAt: string;
   views?: number;
   downloads?: number;
+  tags?: string[]; // Added for English search
 }
 
 export interface SavedNote {
   id: string;
   userId: string;
-  noteId: number;
+  noteId: string;
   noteTitle: string;
   noteDescription: string;
   fileType: string;
@@ -115,6 +116,8 @@ export interface Book {
   image: string;
   inStock: boolean;
   description?: string;
+  enTitle?: string; // Added for English search
+  enAuthor?: string; // Added for English search
 }
 
 export interface Teacher {
@@ -128,6 +131,8 @@ export interface Teacher {
   initial?: string;
   image: string;
   category: string;
+  enName?: string; // Added for English search
+  enSubject?: string; // Added for English search
 }
 
 export interface Institute {
@@ -410,7 +415,7 @@ export const removeSavedNote = async (id: string) => {
   await api.delete(`/saved-notes/${id}`);
 };
 
-export const isNoteSaved = async (userId: string, noteId: number): Promise<boolean> => {
+export const isNoteSaved = async (userId: string, noteId: string): Promise<boolean> => {
   const savedNotes = await getUserSavedNotes(userId);
   return savedNotes.some(sn => sn.noteId === noteId);
 };

@@ -11,8 +11,9 @@ const noteSchema = new mongoose.Schema({
     contentType: { type: String }, // MIME type
     fileName: { type: String }, // Original filename
     size: { type: Number }, // File size in bytes
-    thumbnail: { type: String },
-    createdAt: { type: String, default: () => new Date().toISOString() }
+    thumbnail: String,
+    createdAt: { type: Date, default: Date.now },
+    tags: [String] // Added for English search
 });
 
 module.exports = mongoose.model('Note', noteSchema);

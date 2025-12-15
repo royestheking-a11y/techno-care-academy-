@@ -241,6 +241,8 @@ export function LiveClassSection() {
             <Button
               onClick={() => {
                 setShowLoginPrompt(false);
+                localStorage.setItem("loginRedirect", "live-classes");
+                window.location.hash = "login";
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
               className="w-full bg-gradient-to-r from-[#285046] to-[#2F6057] hover:from-[#2F6057] hover:to-[#285046] text-white"

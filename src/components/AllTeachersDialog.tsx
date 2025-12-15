@@ -9,12 +9,12 @@ import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
 import { motion } from "motion/react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import teacher1 from "figma:asset/48270327a4e815b623f8289d3e1d48bc41ab5cbd.png";
-import teacher2 from "figma:asset/f84a4fe2fdd985bf376e1786cf85c22b46fe8755.png";
-import teacher3 from "figma:asset/835e9e66d42eb36daf2b5c0e857dd914dcb93d72.png";
-import teacher4 from "figma:asset/96bb4a37e15efe0a903c030e8e8b6a1ffa7d687e.png";
-import teacher5 from "figma:asset/74eccd820b240770c0be1ae1d90e8034a32efc12.png";
-import teacher6 from "figma:asset/0f8f57e0ef02906bee742ca0ab59821cbd0f57f4.png";
+const teacher1 = "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=400";
+const teacher2 = "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400";
+const teacher3 = "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400";
+const teacher4 = "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400";
+const teacher5 = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400";
+const teacher6 = "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400";
 
 interface Teacher {
   id: number;
@@ -26,6 +26,8 @@ interface Teacher {
   initial: string;
   image: string;
   category: string;
+  enName?: string;
+  enSubject?: string;
 }
 
 interface AllTeachersDialogProps {
@@ -40,12 +42,12 @@ export function AllTeachersDialog({ open, onOpenChange }: AllTeachersDialogProps
   // Generate 52 teachers with realistic data
   const allTeachers: Teacher[] = [
     // Featured teachers with uploaded images
-    { id: 1, name: "ফাতেমা খাতুন", subject: "রসায়ন", experience: "১২ বছর", rating: 4.8, students: "450+", initial: "FK", image: teacher1, category: "science" },
-    { id: 2, name: "সালমা বেগম", subject: "ইংরেজি", experience: "১০ বছর", rating: 4.7, students: "380+", initial: "SB", image: teacher2, category: "language" },
-    { id: 3, name: "নাজমা আক্তার", subject: "বাংলা", experience: "১৪ বছর", rating: 4.8, students: "490+", initial: "NA", image: teacher3, category: "language" },
-    { id: 4, name: "মো. করিম উদ্দিন", subject: "পদার্থ বিজ্ঞান", experience: "১৫ বছর", rating: 4.9, students: "500+", initial: "MK", image: teacher4, category: "science" },
-    { id: 5, name: "রহিম আলী", subject: "গণিত", experience: "১৮ বছর", rating: 5.0, students: "700+", initial: "RA", image: teacher5, category: "math" },
-    { id: 6, name: "শাকিল আহমেদ", subject: "জীববিজ্ঞান", experience: "১৩ বছর", rating: 4.9, students: "520+", initial: "SA", image: teacher6, category: "science" },
+    { id: 1, name: "ফাতেমা খাতুন", subject: "রসায়ন", experience: "১২ বছর", rating: 4.8, students: "450+", initial: "FK", image: teacher1, category: "science", enName: "Fatema Khatun", enSubject: "Chemistry" },
+    { id: 2, name: "সালমা বেগম", subject: "ইংরেজি", experience: "১০ বছর", rating: 4.7, students: "380+", initial: "SB", image: teacher2, category: "language", enName: "Salma Begum", enSubject: "English" },
+    { id: 3, name: "নাজমা আক্তার", subject: "বাংলা", experience: "১৪ বছর", rating: 4.8, students: "490+", initial: "NA", image: teacher3, category: "language", enName: "Nazma Akter", enSubject: "Bangla" },
+    { id: 4, name: "মো. করিম উদ্দিন", subject: "পদার্থ বিজ্ঞান", experience: "১৫ বছর", rating: 4.9, students: "500+", initial: "MK", image: teacher4, category: "science", enName: "Md. Karim Uddin", enSubject: "Physics" },
+    { id: 5, name: "রহিম আলী", subject: "গণিত", experience: "১৮ বছর", rating: 5.0, students: "700+", initial: "RA", image: teacher5, category: "math", enName: "Rahim Ali", enSubject: "Mathematics" },
+    { id: 6, name: "শাকিল আহমেদ", subject: "জীববিজ্ঞান", experience: "১৩ বছর", rating: 4.9, students: "520+", initial: "SA", image: teacher6, category: "science", enName: "Shakil Ahmed", enSubject: "Biology" },
     { id: 7, name: "ড. আব্দুল কাদির", subject: "উচ্চতর পদার্থবিজ্ঞান", experience: "২০ বছর", rating: 4.9, students: "600+", initial: "AK", image: teacher4, category: "science" },
     { id: 8, name: "রুমানা পারভীন", subject: "জৈব রসায়ন", experience: "১১ বছর", rating: 4.7, students: "420+", initial: "RP", image: teacher1, category: "science" },
     { id: 9, name: "নাসরিন সুলতানা", subject: "পরিবেশ বিজ্ঞান", experience: "৯ বছর", rating: 4.6, students: "350+", initial: "NS", image: teacher2, category: "science" },
@@ -74,7 +76,7 @@ export function AllTeachersDialog({ open, onOpenChange }: AllTeachersDialogProps
     { id: 32, name: "সাবিনা ইয়াসমিন", subject: "ইসলামিক স্টাডিজ", experience: "১১ বছর", rating: 4.7, students: "440+", initial: "SY", image: teacher3, category: "religion" },
     { id: 33, name: "মো. ইমরান হোসেন", subject: "আরবি", experience: "১৪ বছর", rating: 4.8, students: "480+", initial: "IH", image: teacher5, category: "religion" },
     { id: 34, name: "নাদিরা সুলতানা", subject: "কৃষি শিক্ষা", experience: "৯ বছর", rating: 4.6, students: "360+", initial: "NS", image: teacher2, category: "other" },
-    { id: 35, name: "মো. জাহাঙ্গীর আলম", subject: "ক্যারি���়ার গাইডেন্স", experience: "১২ বছর", rating: 4.8, students: "450+", initial: "JA", image: teacher6, category: "other" },
+    { id: 35, name: "মো. জাহাঙ্গীর আলম", subject: "ক্যারিয়ার গাইডেন্স", experience: "১২ বছর", rating: 4.8, students: "450+", initial: "JA", image: teacher6, category: "other" },
     { id: 36, name: "সুমাইয়া আক্তার", subject: "ফিন্যান্স", experience: "৮ বছর", rating: 4.5, students: "340+", initial: "SA", image: teacher1, category: "other" },
     { id: 37, name: "মো. মনিরুল ইসলাম", subject: "হিসাববিজ্ঞান", experience: "১৫ বছর", rating: 4.8, students: "510+", initial: "MI", image: teacher4, category: "other" },
     { id: 38, name: "ফারজানা পারভীন", subject: "ব্যবসায় শিক্ষা", experience: "১০ বছর", rating: 4.7, students: "420+", initial: "FP", image: teacher3, category: "other" },
@@ -97,15 +99,18 @@ export function AllTeachersDialog({ open, onOpenChange }: AllTeachersDialogProps
   // Filter teachers based on category and search query
   const filteredTeachers = allTeachers.filter((teacher) => {
     const matchesCategory = selectedCategory === "all" || teacher.category === selectedCategory;
+    const searchLower = searchQuery.toLowerCase();
     const matchesSearch =
-      teacher.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      teacher.subject.toLowerCase().includes(searchQuery.toLowerCase());
+      teacher.name.toLowerCase().includes(searchLower) ||
+      teacher.subject.toLowerCase().includes(searchLower) ||
+      (teacher.enName && teacher.enName.toLowerCase().includes(searchLower)) ||
+      (teacher.enSubject && teacher.enSubject.toLowerCase().includes(searchLower));
     return matchesCategory && matchesSearch;
   });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
+      <DialogContent
         className="max-w-[1600px] h-[90vh] overflow-hidden p-0 flex flex-col"
         aria-describedby="all-teachers-description"
       >
@@ -193,7 +198,7 @@ export function AllTeachersDialog({ open, onOpenChange }: AllTeachersDialogProps
                       {/* Teacher Image/Avatar Section */}
                       <div className="relative h-48 overflow-hidden bg-gradient-to-br from-[#285046] to-[#2F6057] flex items-center justify-center">
                         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9Ii4xIi8+PC9nPjwvc3ZnPg==')] opacity-20" />
-                        
+
                         {/* Avatar */}
                         <Avatar className="w-32 h-32 ring-4 ring-white shadow-xl relative z-10">
                           <AvatarImage src={teacher.image} alt={teacher.name} />
@@ -218,7 +223,7 @@ export function AllTeachersDialog({ open, onOpenChange }: AllTeachersDialogProps
                       <div className="p-6">
                         <h3 className="text-xl text-[#1A202C] mb-2">{teacher.name}</h3>
                         <p className="text-[#555555] mb-4">{teacher.subject}</p>
-                        
+
                         <div className="flex items-center justify-between gap-4">
                           <div className="flex items-center gap-2 text-[#555555] flex-shrink-0">
                             <User className="w-4 h-4 flex-shrink-0" />

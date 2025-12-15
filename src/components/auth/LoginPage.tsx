@@ -39,9 +39,19 @@ export function LoginPage({ onNavigateToSignup, onNavigateToHome, onNavigateToFo
 
       if (result.success) {
         toast.success("লগইন সফল হয়েছে!");
-        setTimeout(() => {
-          window.location.hash = "dashboard";
-        }, 300);
+
+        // Check for redirect path
+        const redirectPath = localStorage.getItem("loginRedirect");
+        if (redirectPath) {
+          localStorage.removeItem("loginRedirect");
+          setTimeout(() => {
+            window.location.hash = redirectPath;
+          }, 300);
+        } else {
+          setTimeout(() => {
+            window.location.hash = "dashboard";
+          }, 300);
+        }
       } else {
         toast.error(result.message || "ইমেইল বা পাসওয়ার্ড ভুল");
       }
@@ -187,7 +197,13 @@ export function LoginPage({ onNavigateToSignup, onNavigateToHome, onNavigateToFo
             <GoogleLoginButton
               className="bg-white/10 border-white/10 text-white hover:bg-white/20"
               onSuccess={() => {
-                window.location.hash = "dashboard";
+                const redirectPath = localStorage.getItem("loginRedirect");
+                if (redirectPath) {
+                  localStorage.removeItem("loginRedirect");
+                  window.location.hash = redirectPath;
+                } else {
+                  window.location.hash = "dashboard";
+                }
               }}
             />
           </div>

@@ -43,7 +43,7 @@ export function NotesSection() {
   const [filterType, setFilterType] = useState<"all" | "pdf" | "image" | "pptx">("all");
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
-  const [savedNotesIds, setSavedNotesIds] = useState<number[]>([]);
+  const [savedNotesIds, setSavedNotesIds] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -176,7 +176,8 @@ export function NotesSection() {
   const filteredNotes = notes.filter(note => {
     const matchesSearch =
       note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      note.description.toLowerCase().includes(searchQuery.toLowerCase());
+      note.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (note.tags && note.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())));
 
     const matchesType = filterType === "all" || note.fileType === filterType;
 
@@ -448,6 +449,8 @@ export function NotesSection() {
               onClick={() => {
                 setShowLoginPrompt(false);
                 // Trigger login modal from navbar
+                localStorage.setItem("loginRedirect", "notes");
+                window.location.hash = "login";
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
               className="w-full bg-gradient-to-r from-[#285046] to-[#2F6057] hover:from-[#2F6057] hover:to-[#285046] text-white"

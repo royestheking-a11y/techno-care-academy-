@@ -60,6 +60,18 @@ export default function App() {
 
   // Initialize app and preload data during splash
   useEffect(() => {
+    const preloadImages = async (urls: string[]) => {
+      const promises = urls.map((url) => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.src = url;
+          img.onload = resolve;
+          img.onerror = resolve; // Continue even if one fails
+        });
+      });
+      await Promise.all(promises);
+    };
+
     const preloadData = async () => {
       // Initialize app
       await initializeApp();
@@ -72,11 +84,23 @@ export default function App() {
         // Fetch ALL critical data
         // 1. CRITICAL DATA (Blocks Splash Screen)
         // Only fetch what is immediately visible "Above the Fold"
-        await Promise.all([
+        const [slides, courses, notes] = await Promise.all([
           localStorage.getSlides(),   // Hero Carousel
           localStorage.getCourses(),  // First section
           localStorage.getNotes(),    // Second section
         ]);
+
+        // Extract critical images to preload
+        const criticalImages = [
+          ...slides.map(s => s.image),
+          ...courses.slice(0, 4).map(c => c.image), // Preload first row of courses
+          ...notes.slice(0, 4).map(n => n.thumbnail || ""), // Preload first row of notes
+        ].filter(url => url && url.length > 0);
+
+        // Preload images
+        if (criticalImages.length > 0) {
+          await preloadImages(criticalImages);
+        }
 
         // Mark critical data as loaded - DISMISS SPLASH SCREEN NOW
         setIsDataLoaded(true);
@@ -410,7 +434,7 @@ export default function App() {
       {showSplash && (
         <SplashScreen
           onComplete={() => setShowSplash(false)}
-          minDuration={2000}
+          minDuration={2500}
           isDataLoaded={isDataLoaded}
         />
       )}

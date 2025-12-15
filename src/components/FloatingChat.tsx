@@ -483,7 +483,7 @@ export function FloatingChat() {
             style={{
               maxHeight: "calc(100vh - 120px)",
               bottom: "calc(5rem + env(safe-area-inset-bottom))",
-              right: "calc(1rem + env(safe-area-inset-right))"
+              right: "calc(1.25rem + env(safe-area-inset-right))"
             }}
           >
             {/* Header */}
@@ -649,7 +649,7 @@ export function FloatingChat() {
         style={{
           animation: isOpen ? "none" : "bounce 2s infinite",
           bottom: "calc(1rem + env(safe-area-inset-bottom))",
-          right: "calc(1rem + env(safe-area-inset-right))"
+          right: "calc(1.25rem + env(safe-area-inset-right))"
         }}
       >
         <AnimatePresence mode="wait">

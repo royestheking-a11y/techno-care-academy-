@@ -9,7 +9,9 @@ const bookSchema = new mongoose.Schema({
     discount: { type: String },
     image: { type: String, required: true },
     inStock: { type: Boolean, default: true },
-    description: { type: String }
+    description: { type: String },
+    enTitle: { type: String }, // Added for English search
+    enAuthor: { type: String } // Added for English search
 });
 
 module.exports = mongoose.model('Book', bookSchema);

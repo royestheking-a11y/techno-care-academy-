@@ -332,6 +332,8 @@ export function ClassSchedule() {
             <Button
               onClick={() => {
                 setShowLoginPrompt(false);
+                localStorage.setItem("loginRedirect", "schedules");
+                window.location.hash = "login";
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
               className="w-full bg-gradient-to-r from-[#285046] to-[#2F6057] hover:from-[#2F6057] hover:to-[#285046] text-white"

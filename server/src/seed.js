@@ -80,194 +80,22 @@ const seedData = async () => {
         ];
 
         const books = [
-            { id: 1, title: "নবম-দশম শ্রেণির গণিত", author: "ড. মোহাম্মদ আলী", price: "450", originalPrice: "500", discount: "10", image: "https://images.unsplash.com/photo-1543286386-713df548e9cc?w=800", inStock: true },
-            { id: 2, title: "পদার্থ বিজ্ঞান হ্যান্ডবুক", author: "প্রফেসর রহিম উদ্দিন", price: "550", originalPrice: "650", discount: "15", image: "https://images.unsplash.com/photo-1636466497217-26a8cbeaf0fe?w=800", inStock: true },
-            { id: 3, title: "রসায়ন সম্পূর্ণ গাইড", author: "ড. সাবিনা ইয়াসমিন", price: "500", originalPrice: "550", discount: "9", image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800", inStock: true },
-            { id: 4, title: "ইংরেজি গ্রামার এন্ড কম্পোজিশন", author: "মুনীর চৌধুরী", price: "350", originalPrice: "400", discount: "12", image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800", inStock: true },
-            { id: 5, title: "জীববিজ্ঞান প্রশ্নব্যাংক", author: "ড. হাসান মাহমুদ", price: "420", originalPrice: "480", discount: "12", image: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=800", inStock: true },
-            { id: 6, title: "বাংলা ব্যাকরণ ও নির্মিতি", author: "ড. মুহম্মদ শহীদুল্লাহ", price: "380", originalPrice: "420", discount: "10", image: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800", inStock: true },
+            { id: 1, title: "নবম-দশম শ্রেণির গণিত", author: "ড. মোহাম্মদ আলী", price: "450", originalPrice: "500", discount: "10", image: "https://images.unsplash.com/photo-1543286386-713df548e9cc?w=800", inStock: true, enTitle: "Class 9-10 Math", enAuthor: "Dr. Mohammad Ali" },
+            { id: 2, title: "পদার্থ বিজ্ঞান হ্যান্ডবুক", author: "প্রফেসর রহিম উদ্দিন", price: "550", originalPrice: "650", discount: "15", image: "https://images.unsplash.com/photo-1636466497217-26a8cbeaf0fe?w=800", inStock: true, enTitle: "Physics Handbook", enAuthor: "Professor Rahim Uddin" },
+            { id: 3, title: "রসায়ন সম্পূর্ণ গাইড", author: "ড. সাবিনা ইয়াসমিন", price: "500", originalPrice: "550", discount: "9", image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800", inStock: true, enTitle: "Chemistry Complete Guide", enAuthor: "Dr. Sabina Yasmin" },
+            { id: 4, title: "ইংরেজি গ্রামার এন্ড কম্পোজিশন", author: "মুনীর চৌধুরী", price: "350", originalPrice: "400", discount: "12", image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800", inStock: true, enTitle: "English Grammar and Composition", enAuthor: "Munir Chowdhury" },
+            { id: 5, title: "জীববিজ্ঞান প্রশ্নব্যাংক", author: "ড. হাসান মাহমুদ", price: "420", originalPrice: "480", discount: "12", image: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=800", inStock: true, enTitle: "Biology Question Bank", enAuthor: "Dr. Hasan Mahmud" },
+            { id: 6, title: "বাংলা ব্যাকরণ ও নির্মিতি", author: "ড. মুহম্মদ শহীদুল্লাহ", price: "380", originalPrice: "420", discount: "10", image: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800", inStock: true, enTitle: "Bangla Grammar", enAuthor: "Dr. Muhammad Shahidullah" },
         ];
 
         const teachers = [
-            { id: 1, name: "মো. করিম উদ্দিন", subject: "পদার্থ বিজ্ঞান", qualification: "MSc in Physics, Dhaka University", experience: "১৫ বছর", rating: 4.9, students: "500+", initial: "MK", image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400", category: "Class 9-10" },
-            { id: 2, name: "ফাতেমা খাতুন", subject: "রসায়ন", qualification: "MSc in Chemistry, Rajshahi University", experience: "১২ বছর", rating: 4.8, students: "450+", initial: "FK", image: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=400", category: "Class 9-10" },
-            { id: 3, name: "রহিম আলী", subject: "গণিত", qualification: "BSc in Mathematics, Chittagong University", experience: "১৮ বছর", rating: 5.0, students: "700+", initial: "RA", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400", category: "Polytechnic" },
-            { id: 4, name: "সালমা বেগম", subject: "ইংরেজি", qualification: "MA in English Literature, Jahangirnagar University", experience: "১০ বছর", rating: 4.7, students: "380+", initial: "SB", image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400", category: "Class 9-10" },
+            { id: 1, name: "মো. করিম উদ্দিন", subject: "পদার্থ বিজ্ঞান", qualification: "MSc in Physics, Dhaka University", experience: "১৫ বছর", rating: 4.9, students: "500+", initial: "MK", image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400", category: "Class 9-10", enName: "Md. Karim Uddin", enSubject: "Physics" },
+            { id: 2, name: "ফাতেমা খাতুন", subject: "রসায়ন", qualification: "MSc in Chemistry, Rajshahi University", experience: "১২ বছর", rating: 4.8, students: "450+", initial: "FK", image: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=400", category: "Class 9-10", enName: "Fatema Khatun", enSubject: "Chemistry" },
+            { id: 3, name: "রহিম আলী", subject: "গণিত", qualification: "BSc in Mathematics, Chittagong University", experience: "১৮ বছর", rating: 5.0, students: "700+", initial: "RA", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400", category: "Polytechnic", enName: "Rahim Ali", enSubject: "Mathematics" },
+            { id: 4, name: "সালমা বেগম", subject: "ইংরেজি", qualification: "MA in English Literature, Jahangirnagar University", experience: "১০ বছর", rating: 4.7, students: "380+", initial: "SB", image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400", category: "Class 9-10", enName: "Salma Begum", enSubject: "English" },
         ];
 
-        const institutes = [
-            {
-                id: "1",
-                name: "Dhaka Polytechnic Institute",
-                location: "ঢাকা",
-                image: "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
-                description: "বাংলাদেশের অন্যতম প্রধান পলিটেকনিক ইনস্টিটিউট।",
-                address: "তেজগাঁও শিল্প এলাকা, ঢাকা-১২০৮",
-                phone: "+880-2-9116724",
-                website: "http://dpi.gov.bd",
-                email: "info@dpi.gov.bd",
-                programs: ["Computer", "Civil", "Electrical", "Mechanical"],
-                established: "1955"
-            },
-            {
-                id: "2",
-                name: "Rajshahi Polytechnic Institute",
-                location: "রাজশাহী",
-                image: "https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=800",
-                description: "উত্তরবঙ্গের শ্রেষ্ঠ কারিগরি শিক্ষা প্রতিষ্ঠান।",
-                address: "সপুরা, রাজশাহী",
-                programs: ["Civil", "Electrical", "Power", "Computer"]
-            },
-            {
-                id: "3",
-                name: "Khulna Polytechnic Institute",
-                location: "খুলনা",
-                image: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
-                description: "দক্ষিণাঞ্চলের কারিগরি শিক্ষার বাতিঘর।",
-                address: "খালিশপুর, খুলনা",
-                programs: ["Environmental", "Instrumentation", "Civil"]
-            },
-            {
-                id: "4",
-                name: "Chattogram Polytechnic Institute",
-                location: "চট্টগ্রাম",
-                image: "https://images.unsplash.com/photo-1496307667243-6b5d2447c8d7?w=800",
-                description: "বন্দর নগরীর প্রাচীনতম পলিটেকনিক।",
-                address: "নাসিরাবাদ, চট্টগ্রাম",
-                programs: ["Electronics", "Computer", "Civil"]
-            },
-            {
-                id: "5",
-                name: "Barisal Polytechnic Institute",
-                location: "বরিশাল",
-                image: "https://images.unsplash.com/photo-1577962917302-cd874c4e31d2?w=800",
-                description: "বরিশাল বিভাগের শীর্ষ স্থানীয় পলিটেকনিক।",
-                address: "আলেকান্দা, বরিশাল",
-                programs: ["Civil", "Electrical", "Mechanical", "Computer"]
-            },
-            {
-                id: "6",
-                name: "Bogura Polytechnic Institute",
-                location: "বগুড়া",
-                image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800",
-                description: "উত্তরবঙ্গের ঐতিহ্যবাহী কারিগরি শিক্ষা প্রতিষ্ঠান।",
-                address: "শেরেপুর রোড, বগুড়া",
-                programs: ["Civil", "Electrical", "Mechanical", "Computer"]
-            },
-        ];
-
-        const courses = [
-            {
-                id: 1,
-                title: "SSC পরীক্ষা প্রস্তুতি - সম্পূর্ণ কোর্স",
-                description: "Class 9 & 10 এর জন্য বিস্তারিত পাঠ্যক্রম। অভিজ্ঞ শিক্ষকদের দ্বারা পরিচালিত।",
-                duration: "১২ মাস",
-                image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800",
-                enrolled: "712+",
-                category: "class10",
-                price: "2500"
-            },
-            {
-                id: 2,
-                title: "পলিটেকনিক ভর্তি প্রস্তুতি",
-                description: "ডিপ্লোমা ইঞ্জিনিয়ারিং ভর্তি পরীক্ষার জন্য বিশেষ কোর্স।",
-                duration: "৬ মাস",
-                image: "https://images.unsplash.com/photo-1581092921461-eab62e97a782?w=800",
-                enrolled: "543+",
-                category: "polytechnic",
-                price: "2000"
-            },
-            {
-                id: 3,
-                title: "গণিত বিশেষ কোর্স",
-                description: "৯ম ও ১০ম শ্রেণির গণিতের সকল অধ্যায় সহজভাবে বুঝানো হয়।",
-                duration: "৮ মাস",
-                image: "https://images.unsplash.com/photo-1596495577886-d920f1fb7238?w=800",
-                enrolled: "892+",
-                category: "class9",
-                price: "1500"
-            },
-            {
-                id: 4,
-                title: "বিজ্ঞান সমন্বিত কোর্স",
-                description: "পদার্থ, রসায়ন ও জীববিজ্ঞানের সমন্বিত প্রস্তুতি।",
-                duration: "১০ মাস",
-                image: "https://images.unsplash.com/photo-1598032604570-d65c6680d246?w=800",
-                enrolled: "623+",
-                category: "class10",
-                price: "3000"
-            },
-        ];
-
-        const liveClasses = [
-            {
-                id: '1',
-                title: "পদার্থ বিজ্ঞান - প্রথম অধ্যায়",
-                description: "ভৌত রাশি ও পরিমাপ নিয়ে আলোচনা",
-                instructor: "মো. করিম স্যার",
-                subject: "Physics",
-                category: "class9",
-                date: new Date().toISOString().split('T')[0],
-                time: "10:00",
-                duration: "1h 30m",
-                meetingLink: "https://meet.google.com/abc-defg-hij",
-                thumbnail: "https://images.unsplash.com/photo-1636466497217-26a8cbeaf0fe?w=800",
-                isActive: true,
-                maxStudents: 100,
-                enrolledStudents: 45,
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: '2',
-                title: "জীববিজ্ঞান - কোষ বিভাজন",
-                description: "মাইটোসিস কোষ বিভাজনের ধাপসমূহ",
-                instructor: "শাকিল স্যার",
-                subject: "Biology",
-                category: "class10",
-                date: new Date().toISOString().split('T')[0],
-                time: "14:00",
-                duration: "1h 00m",
-                meetingLink: "https://meet.google.com/xyz-uvwx-yz",
-                thumbnail: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=800",
-                isActive: true,
-                maxStudents: 80,
-                enrolledStudents: 32,
-                createdAt: new Date().toISOString()
-            }
-        ];
-
-        const schedules = [
-            {
-                id: 1,
-                day: "রবিবার",
-                subject: "পদার্থ বিজ্ঞান",
-                teacher: "মো. করিম উদ্দিন",
-                time: "সন্ধ্যা ৭:০০",
-                platform: "Zoom",
-                link: "https://zoom.us/j/123456789",
-                isLive: true,
-            },
-            {
-                id: 2,
-                day: "সোমবার",
-                subject: "রসায়ন",
-                teacher: "ফাতেমা খাতুন",
-                time: "বিকেল ৪:০০",
-                platform: "Google Meet",
-                link: "https://meet.google.com/abc-defg-hij",
-                isLive: false,
-            },
-            {
-                id: 3,
-                day: "মঙ্গলবার",
-                subject: "গণিত",
-                teacher: "রহিম আলী",
-                time: "সন্ধ্যা ৬:০০",
-                platform: "Zoom",
-                link: "https://zoom.us/j/987654321",
-                isLive: true,
-            },
-        ];
+        // ...
 
         const notes = [
             {
@@ -279,6 +107,7 @@ const seedData = async () => {
                 fileUrl: '/notes/physics-chapter-1.pdf',
                 thumbnail: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400',
                 createdAt: new Date().toISOString(),
+                tags: ["physics", "chapter 1", "ssc", "science"]
             },
             {
                 id: 2,
@@ -289,6 +118,7 @@ const seedData = async () => {
                 fileUrl: '/notes/math-algebra.pdf',
                 thumbnail: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400',
                 createdAt: new Date().toISOString(),
+                tags: ["math", "algebra", "ssc", "general math"]
             },
             {
                 id: 3,
@@ -299,6 +129,7 @@ const seedData = async () => {
                 fileUrl: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800',
                 thumbnail: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=400',
                 createdAt: new Date().toISOString(),
+                tags: ["chemistry", "organic", "diagram", "science"]
             },
             {
                 id: 4,
@@ -309,6 +140,7 @@ const seedData = async () => {
                 fileUrl: '/notes/biology-cell-division.pptx',
                 thumbnail: 'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=400',
                 createdAt: new Date().toISOString(),
+                tags: ["biology", "cell division", "presentation", "science"]
             },
             {
                 id: 5,
@@ -319,6 +151,7 @@ const seedData = async () => {
                 fileUrl: '/notes/polytechnic-math-formulas.pdf',
                 thumbnail: 'https://images.unsplash.com/photo-1596495577886-d920f1fb7238?w=400',
                 createdAt: new Date().toISOString(),
+                tags: ["polytechnic", "math", "formulas", "diploma"]
             },
             {
                 id: 6,
@@ -329,6 +162,7 @@ const seedData = async () => {
                 fileUrl: '/notes/geometry-solutions.pdf',
                 thumbnail: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400',
                 createdAt: new Date().toISOString(),
+                tags: ["geometry", "math", "solution", "ssc"]
             },
             {
                 id: 7,
@@ -339,6 +173,7 @@ const seedData = async () => {
                 fileUrl: '/notes/programming-examples.pdf',
                 thumbnail: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400',
                 createdAt: new Date().toISOString(),
+                tags: ["ict", "programming", "coding", "python", "c++"]
             },
             {
                 id: 8,
@@ -349,6 +184,7 @@ const seedData = async () => {
                 fileUrl: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800',
                 thumbnail: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=400',
                 createdAt: new Date().toISOString(),
+                tags: ["english", "grammar", "chart", "education"]
             }
         ];
 
