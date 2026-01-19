@@ -487,8 +487,8 @@ This project is proprietary software for Techno Care Academy.
 ## 📞 **Support**
 
 For issues or questions:
-- **Email**: support@technocare.com
-- **Phone**: +880 1712-345678
+- **Email**: aurangzebsunnyy@gmail.com
+- **Phone**: +880 17625691878
 - **Address**: Dhaka, Bangladesh
 
 ---
