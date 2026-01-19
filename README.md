@@ -2,7 +2,7 @@
 
 A comprehensive educational coaching application built for Bangladesh-based students focusing on Class 9, Class 10, and Polytechnic programs.
 
-## 🎯 **Project Overview**
+##  **Project Overview**
 
 Techno Care Academy is a full-featured educational platform with:
 - **Student Portal**: Course enrollment, book ordering, notes access, profile management
@@ -13,9 +13,9 @@ Techno Care Academy is a full-featured educational platform with:
 
 ---
 
-## ✨ **Key Features**
+##  **Key Features**
 
-### **For Students** 👨‍🎓
+### **For Students** 
 - ✅ User registration and authentication
 - ✅ Course enrollment with admin confirmation
 - ✅ Book marketplace with checkout
@@ -25,7 +25,7 @@ Techno Care Academy is a full-featured educational platform with:
 - ✅ Order and enrollment tracking
 - ✅ Personalized dashboard
 
-### **For Admins** 🛠️
+### **For Admins** 
 - ✅ Complete student management
 - ✅ Course and enrollment management
 - ✅ Teacher profiles management
@@ -37,7 +37,7 @@ Techno Care Academy is a full-featured educational platform with:
 - ✅ Advanced image upload with crop/resize
 - ✅ Real-time data synchronization
 
-### **Public Features** 🌐
+### **Public Features** 
 - ✅ Dynamic hero carousel
 - ✅ Course catalog with filters
 - ✅ Teacher profiles
@@ -49,7 +49,7 @@ Techno Care Academy is a full-featured educational platform with:
 
 ---
 
-## 🎨 **Design System**
+##  **Design System**
 
 ### **Color Palette**
 ```css
@@ -71,7 +71,7 @@ Highlight: #FFB703
 
 ---
 
-## 🚀 **Getting Started**
+## **Getting Started**
 
 ### **Installation**
 
@@ -98,7 +98,7 @@ npm run dev
 
 ---
 
-## 📂 **Project Structure**
+##  **Project Structure**
 
 ```
 /
@@ -145,7 +145,7 @@ npm run dev
 
 ---
 
-## 💾 **Data Management**
+##  **Data Management**
 
 ### **LocalStorage Structure**
 
@@ -181,7 +181,7 @@ Mock data is automatically initialized on first load.
 
 ---
 
-## 🔧 **Key Technologies**
+##  **Key Technologies**
 
 - **React 18** - UI framework
 - **TypeScript** - Type safety
@@ -194,7 +194,7 @@ Mock data is automatically initialized on first load.
 
 ---
 
-## 📱 **Features Breakdown**
+##  **Features Breakdown**
 
 ### **1. Authentication System**
 - User registration with validation
@@ -273,7 +273,7 @@ Admin → Confirm → Process Delivery
 
 ---
 
-## 🎓 **User Journeys**
+##  **User Journeys**
 
 ### **New Student Journey**
 1. Visit homepage
@@ -301,7 +301,7 @@ Admin → Confirm → Process Delivery
 
 ---
 
-## 🖼️ **Image Upload Workflow**
+## **Image Upload Workflow**
 
 ```
 Select File → Validate (size/type)
@@ -321,7 +321,7 @@ Display in UI
 
 ---
 
-## 🔐 **Security Features**
+##  **Security Features**
 
 - Client-side password validation
 - Session management
@@ -332,7 +332,7 @@ Display in UI
 
 ---
 
-## 📊 **Statistics & Analytics**
+##  **Statistics & Analytics**
 
 ### **Dashboard Metrics**:
 - Total students
@@ -346,7 +346,7 @@ Display in UI
 
 ---
 
-## 🌐 **Responsive Design**
+##  **Responsive Design**
 
 ### **Breakpoints**:
 - Mobile: < 640px
@@ -363,7 +363,7 @@ Display in UI
 
 ---
 
-## 🧪 **Testing Guide**
+##  **Testing Guide**
 
 ### **Test Admin Features**:
 1. Login to admin panel
@@ -387,7 +387,7 @@ Display in UI
 
 ---
 
-## 📚 **Documentation Files**
+##  **Documentation Files**
 
 - `/README.md` - This file (Project overview)
 - `/COMPREHENSIVE_UPDATE_SUMMARY.md` - Phase 1 details
@@ -396,7 +396,7 @@ Display in UI
 
 ---
 
-## 🐛 **Troubleshooting**
+##  **Troubleshooting**
 
 ### **Common Issues**:
 
@@ -422,7 +422,7 @@ Display in UI
 
 ---
 
-## 🚀 **Performance**
+##  **Performance**
 
 ### **Optimizations**:
 - Lazy loading for images
@@ -439,7 +439,7 @@ Display in UI
 
 ---
 
-## 🔮 **Future Enhancements**
+##  **Future Enhancements**
 
 ### **Planned Features**:
 - [ ] Backend integration (Firebase/Supabase)
@@ -457,7 +457,7 @@ Display in UI
 
 ---
 
-## 🤝 **Contributing**
+##  **Contributing**
 
 Contributions are welcome! Please follow these guidelines:
 
@@ -469,13 +469,13 @@ Contributions are welcome! Please follow these guidelines:
 
 ---
 
-## 📄 **License**
+##  **License**
 
 This project is proprietary software for Techno Care Academy.
 
 ---
 
-## 👥 **Team**
+##  **Team**
 
 - **Project Type**: Educational Platform
 - **Target Users**: Class 9, 10, and Polytechnic students in Bangladesh
@@ -484,7 +484,7 @@ This project is proprietary software for Techno Care Academy.
 
 ---
 
-## 📞 **Support**
+##  **Support**
 
 For issues or questions:
 - **Email**: aurangzebsunnyy@gmail.com
@@ -493,7 +493,7 @@ For issues or questions:
 
 ---
 
-## 🎉 **Acknowledgments**
+##  **Acknowledgments**
 
 - Design inspired by modern educational platforms
 - Icons by Lucide React
@@ -503,7 +503,7 @@ For issues or questions:
 
 ---
 
-## 📈 **Version History**
+##  **Version History**
 
 ### **v4.0.0 - Full Premium Edition** (Current)
 - ✅ Complete admin panel with 12 sections
@@ -530,9 +530,9 @@ For issues or questions:
 
 ---
 
-## 🏆 **Project Status**
+##  **Project Status**
 
-**Status**: ✅ **COMPLETE AND PRODUCTION READY**
+**Status**:  **COMPLETE AND PRODUCTION READY**
 
 **Last Updated**: December 6, 2025
 
@@ -544,7 +544,7 @@ For issues or questions:
 
 ---
 
-## 💡 **Quick Start Commands**
+##  **Quick Start Commands**
 
 ```bash
 # Development
